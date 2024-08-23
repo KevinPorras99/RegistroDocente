@@ -26,6 +26,9 @@ Route::get('/home', [SessionController::class, 'home'])->middleware('auth')->nam
 
 Route::get('/estudiantes', [StudentController::class, 'estudiantes'])->name('estudiantes');
 Route::post('/estudiantes', [StudentController::class, 'store'])->name('students.store_student');
+Route::get('/estudiantes', [SessionController::class, 'estudiantes'])->name('estudiantes');
+Route::get('/cursos', [SessionController::class, 'cursos'])->name('cursos');
+
 
 Route::post('/profile/upload', [SessionController::class, 'uploadProfileImage'])->name('profile.upload');
 Route::delete('/profile/delete', [SessionController::class, 'deleteProfileImage'])->name('profile.delete');
