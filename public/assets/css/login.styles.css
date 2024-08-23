@@ -1,0 +1,313 @@
+@import url('https://fonts.googleapis.com/css2?family=Abel&display=swap');
+
+h1 {
+    font-family: 'Abel', sans-serif;
+    color: #0d6efc; /* Color celeste */
+    text-align: center;
+    
+}
+
+body {
+    font-family: 'Mulish', sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    overflow-x: hidden; /* Evita el desbordamiento horizontal */
+}
+.bienvenido {
+    font-weight: 700;
+    font-size: 36px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 50px;
+}
+.form-control {
+    background-color: #ffffff;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px;
+    width: 100%;
+    margin-left: 0;
+}
+.form-control::placeholder {
+    color: #999;
+}
+
+/* Nueva regla para mantener los colores al enfocarse */
+.form-control:focus {
+    background-color: #ffffff;
+    color: #333;
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.btn-login {
+    background: linear-gradient(90deg, #007bff, #0056b3);
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+    padding: 10px;
+    width: 100%;
+    margin: 20px 0 0 0;
+    display: block;
+}
+.btn-login:hover {
+    background: linear-gradient(90deg, #0056b3, #007bff);
+}
+.form-group label {
+    color: #333;
+    display: block;
+    margin-bottom: 8px;
+}
+.right-half {
+    padding: 50px 60px;
+}
+.steam-icon {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 80px;
+}
+.mt-4 {
+    margin-top: 70px !important;
+    text-align: center;
+}
+.bg-dark-custom {
+    background-color: #ffffff;
+}
+.left-image {
+    height: 100vh;
+    width: 100%;
+    object-fit: cover;
+}
+.todava-no-tienes {
+    color: #333;
+}
+.centered-form {
+    max-width: 400px;
+    margin: 0 auto;
+}
+.password-wrapper {
+    position: relative;
+}
+.password-wrapper i {
+    position: absolute;
+    bottom: 2%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #333;
+    font-size: 18px;
+    padding: 0 10px;
+    background: transparent;
+    border: none;
+}
+.card {
+    max-width: 100%;
+    margin: 20px auto;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.register-container {
+    max-width: 400px; /* Ajusta este valor según tus necesidades */
+    margin: 20px auto;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.wider-card {
+    width: 600px; /* Ajusta este valor según tus necesidades */
+    margin: 0 auto; /* Centrar la carta */
+    padding: 70px;
+}
+
+.navbar-custom {
+    background: linear-gradient(90deg, #37cbfc, #460ffa); /* Degradado de azul a celeste */
+    padding: 5px 10px;
+}
+
+.navbar-custom .navbar-brand img {
+    height: 70px; /* Ajusta el tamaño del logo según sea necesario */
+}
+
+.footer-custom {
+    background-color: #9dc5ff; /* Color del footer */
+    color: #000000;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    height: 100px;
+}
+
+.footer-custom .social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 30px; /* Espaciado entre los iconos */
+}
+
+.footer-custom .icon-circle {
+    width: 30px;
+    height: 30px;
+    background-color: #007bff; /* Color azul */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 15px;
+    transition: background-color 0.3s;
+}
+
+.footer-custom .icon-circle a {
+    color: white;
+    text-decoration: none;
+}
+
+.footer-custom .icon-circle:hover {
+    background-color: #0056b3; /* Color azul oscuro al pasar el ratón */
+}
+
+.footer-custom .privacy-terms a {
+    color: #000000;
+    text-decoration: none;
+    margin-left: 15px;
+}
+
+.footer-custom .privacy-terms a:hover {
+    text-decoration: underline;
+}
+
+/*Icono de usuario*/
+.icon-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.icon-circle {
+    width: 80px;
+    height: 80px;
+    background-color: #007bff; /* Color azul */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 40px;
+}
+
+/*Mensajes de error*/
+.password-requirements {
+    text-align: left;
+    margin-top: 10px;
+    display: none; /* Oculto por defecto */
+}
+
+.password-requirements ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+.password-requirements li {
+    font-size: 14px;
+    color: rgb(2, 2, 2);
+}
+
+.password-requirements li.valid {
+    color: green;
+}
+
+.password-requirements li.invalid {
+    color: red;
+}
+
+.match-requirements {
+    text-align: left;
+    margin-top: 10px;
+    display: none; /* Oculto por defecto */
+}
+
+.match-requirements ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+.match-requirements li {
+    font-size: 14px;
+    color: red;
+}
+
+.match-requirements li.valid {
+    color: green;
+}
+
+.match-requirements li.invalid {
+    color: red;
+}
+
+.alert-success, .alert-danger {
+    color: #fff;
+    background-color: #28a745; /* Éxito */
+    border-color: #28a745;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+.alert-danger {
+    background-color: #dc3545; /* Error */
+    border-color: #dc3545;
+}
+
+/*Change password*/
+
+
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.requirement {
+    color: black;
+}
+.requirement i {
+    display: none;
+    color: green;
+}
+.requirement.valid i {
+    display: inline;
+}
+@media (max-height: 600px) {
+    .container {
+        justify-content: flex-start;
+        padding-top: 20px;
+    }
+
+    .footer {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding-bottom: 80px; /* Ensure space for footer on mobile */
+    }
+
+    .footer {
+        position: relative;
+    }
+
+}
