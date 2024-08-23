@@ -143,7 +143,11 @@ class SessionController extends Controller {
         return redirect()->route('home')->with('success', 'Foto de perfil eliminada correctamente.');
     }
 
-    
+    public function estudiantes()
+    {
+        $user = Auth::user(); // Obtén el usuario autenticado
+        return view('estudiantes', ['user' => $user]); // Pasa el usuario a la vista// Pasa los datos a la vista si es necesario
+    }
     
     public function destroy() {
         Auth::logout();

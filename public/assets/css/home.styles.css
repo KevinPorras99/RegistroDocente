@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Abel&display=swap');
 
 h2 {
     text-align: center;
@@ -11,7 +12,7 @@ body, html {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: 'Mulish', sans-serif;
+    font-family: 'Abel', sans-serif;
 }
 
 .sidebar {
@@ -27,7 +28,6 @@ body, html {
     flex-direction: column;
     justify-content: space-between;
     overflow-y: auto; /* Permite el desplazamiento vertical en la sidebar */
-     /* Asegura que la sidebar esté detrás de la navbar */
 }
 
 .sidebar.minimized {
@@ -37,7 +37,6 @@ body, html {
 .sidebar a {
     padding: 15px 20px;
     text-decoration: none;
-    font-style: italic;
     font-size: 18px;
     color: white;
     display: flex;
@@ -121,12 +120,11 @@ body, html {
     margin-left: 250px;
     transition: margin-left 0.3s, width 0.3s;
     width: calc(100% - 250px);
-     /* Asegura que la navbar esté delante de la sidebar */
 }
 
 .navbar.minimized {
-    margin-left: 80px;
-    width: 100%;
+    margin-left: 80px; /* Ajusta el margen izquierdo del navbar cuando el sidebar está minimizado */
+    width: calc(100% - 80px); /* Ajusta el ancho del navbar cuando el sidebar está minimizado */
 }
 
 .navbar .logo img {
@@ -417,7 +415,7 @@ body, html {
 
     .navbar.minimized {
         margin-left: 60px;
-        width: 100%;
+        width: calc(100% - 60px);
     }
 
     .content {

@@ -20,6 +20,7 @@ Route::post('/reset-password', [SessionController::class, 'reset'])->name('passw
 Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register.index');
 Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
 Route::get('/home', [SessionController::class, 'home'])->middleware('auth')->name('home');
+Route::get('/estudiantes', [SessionController::class, 'estudiantes'])->name('estudiantes');
 
 Route::post('/profile/upload', [SessionController::class, 'uploadProfileImage'])->name('profile.upload');
 Route::delete('/profile/delete', [SessionController::class, 'deleteProfileImage'])->name('profile.delete');

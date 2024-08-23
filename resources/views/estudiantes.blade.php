@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio</title>
+    <title>Estudiantes</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;700&display=swap" rel="stylesheet">
@@ -62,7 +62,7 @@
     </div>
 
     <div class="content">
-        <h1>Bienvenido al Sistema de Gestión Escolar</h1>
+        <h1>Estudiantes</h1>
         <p>Selecciona una opción del menú para comenzar.</p>
         <!-- Aquí puedes añadir el contenido correspondiente a cada sección -->
     </div>
@@ -114,6 +114,5 @@
 
 </body>
 </html>
-
 
 <script src="{{ asset('js/sideynavbar.script.js') }}"></script>
