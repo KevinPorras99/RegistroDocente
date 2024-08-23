@@ -4,11 +4,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\StudentController;
 
 // Vista por defecto redirigida a login
 Route::get('/', function () {
     return redirect()->route('login.index');
 })->middleware('guest');
+
+Route::resource('students', StudentController::class);
 
 Route::get('/login', [SessionController::class, 'create'])->middleware('guest')->name('login.index');
 Route::post('/login', [SessionController::class, 'store'])->name('login.store');
@@ -20,7 +23,9 @@ Route::post('/reset-password', [SessionController::class, 'reset'])->name('passw
 Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register.index');
 Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
 Route::get('/home', [SessionController::class, 'home'])->middleware('auth')->name('home');
-Route::get('/estudiantes', [SessionController::class, 'estudiantes'])->name('estudiantes');
+
+Route::get('/estudiantes', [StudentController::class, 'estudiantes'])->name('estudiantes');
+Route::post('/estudiantes', [StudentController::class, 'store'])->name('students.store_student');
 
 Route::post('/profile/upload', [SessionController::class, 'uploadProfileImage'])->name('profile.upload');
 Route::delete('/profile/delete', [SessionController::class, 'deleteProfileImage'])->name('profile.delete');

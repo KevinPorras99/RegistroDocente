@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('assets/css/home.styles.css') }}">
+    <script src="{{ asset('js/sideynavbar.script.js') }}"></script>
 </head>
 <body>
     <div class="sidebar">
@@ -64,8 +65,76 @@
     <div class="content">
         <h1>Estudiantes</h1>
         <p>Selecciona una opción del menú para comenzar.</p>
-        <!-- Aquí puedes añadir el contenido correspondiente a cada sección -->
+        
+        <!-- Botón para agregar estudiante -->
+        <button class="btn btn-primary" onclick="openAddStudentModal()">
+            <i class="fas fa-plus"></i> Agregar estudiante
+        </button>
+
+        <!-- Lista de estudiantes -->
+        <div class="container">
+            <h1>Lista de Estudiantes</h1>
+            @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Grado</th>
+                        <th>Institución</th>
+                        <th>Sección</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($students as $student)
+                        <tr>
+                            <td>{{ $student->name }}</td>
+                            <td>{{ $student->grade }}</td>
+                            <td>{{ $student->institution }}</td>
+                            <td>{{ $student->section }}</td>
+                            <td>
+                                <!-- Agregar botones de acción aquí -->
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
+
+    <!-- Modal para agregar estudiante -->
+    <div id="addStudentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddStudentModal()">&times;</span>
+            <h2>Agregar Estudiante</h2>
+            <form action="{{ route('students.store') }}" method="POST">
+                @csrf
+                <div class="form-group">
+                    <label for="name">Nombre</label>
+                    <input type="text" id="name" name="name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="grade">Grado</label>
+                    <input type="text" id="grade" name="grade" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="institution">Institución</label>
+                    <input type="text" id="institution" name="institution" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="section">Sección</label>
+                    <input type="text" id="section" name="section" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Agregar</button>
+            </form>
+        </div>
+    </div>
+
+    
 
 
     <div id="profileModal" class="modal">
@@ -115,4 +184,34 @@
 </body>
 </html>
 
-<script src="{{ asset('js/sideynavbar.script.js') }}"></script>
+<script>
+    function openAddStudentModal() {
+        document.getElementById('addStudentModal').style.display = 'block';
+    }
+
+    function closeAddStudentModal() {
+        document.getElementById('addStudentModal').style.display = 'none';
+    }
+
+    function viewStudent(id) {
+        // Implementar lógica para visualizar datos del estudiante
+    }
+
+    function editStudent(id) {
+        // Implementar lógica para editar datos del estudiante
+    }
+
+    function deleteStudent(id) {
+        // Implementar lógica para eliminar estudiante
+    }
+
+   
+        // Desaparecer el mensaje de éxito después de 3 segundos
+        setTimeout(function() {
+            var successMessage = document.getElementById('success-message');
+            if (successMessage) {
+                successMessage.style.display = 'none';
+            }
+        }, 3000); // 3000 milisegundos = 3 segundos
+    
+</script>

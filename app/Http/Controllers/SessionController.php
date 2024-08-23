@@ -13,6 +13,8 @@ use App\Mail\resetPasswordMail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Student;
+
 
 
 class SessionController extends Controller {
@@ -143,12 +145,9 @@ class SessionController extends Controller {
         return redirect()->route('home')->with('success', 'Foto de perfil eliminada correctamente.');
     }
 
-    public function estudiantes()
-    {
-        $user = Auth::user(); // Obtén el usuario autenticado
-        return view('estudiantes', ['user' => $user]); // Pasa el usuario a la vista// Pasa los datos a la vista si es necesario
-    }
     
+
+
     public function destroy() {
         Auth::logout();
         return redirect()->to('/');
