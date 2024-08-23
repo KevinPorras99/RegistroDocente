@@ -18,7 +18,7 @@
                 <span>Registro Docente</span>
             </div>
             <a href="{{ route('home') }}"><i class="fas fa-home"></i> <span> Inicio</span></a>
-            <a href="{{ route('cursos') }}"><i class="fas fa-book"></i> <span> Cursos</span></a>
+            <a href=""><i class="fas fa-book"></i> <span> Cursos</span></a>
             <a href="{{ route('estudiantes') }}"><i class="fas fa-user-graduate"></i> <span> Estudiantes</span></a>
             <a href="#trabajo-cotidiano"><i class="fas fa-briefcase"></i> <span> Trabajo Cotidiano</span></a>
             <a href="#pruebas-examenes"><i class="fas fa-file-alt"></i> <span> Pruebas o Exámenes</span></a>
