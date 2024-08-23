@@ -84,4 +84,111 @@
 </html>
 
 
-<script src="{{ asset('js/login.script.js') }}"></script>
+<script>
+    // Funcionalidad para mostrar u ocultar la contraseña 
+    const togglePassword = document.querySelector("#togglePassword");
+    const password = document.querySelector("#password");
+    const togglePasswordConfirmation = document.querySelector("#togglePasswordConfirmation");
+    const passwordConfirmation = document.querySelector("#password_confirmation");
+    const passwordRequirements = document.getElementById("passwordRequirements");
+    const matchRequirements = document.getElementById("matchRequirements");
+
+    const lengthRequirement = document.getElementById("lengthRequirement");
+    const uppercaseRequirement = document.getElementById("uppercaseRequirement");
+    const lowercaseRequirement = document.getElementById("lowercaseRequirement");
+    const numberRequirement = document.getElementById("numberRequirement");
+    const specialRequirement = document.getElementById("specialRequirement");
+    const matchRequirement = document.getElementById("matchRequirement");
+
+    password.addEventListener("focus", function () {
+        passwordRequirements.style.display = "block";
+    });
+
+    password.addEventListener("blur", function () {
+        passwordRequirements.style.display = "none";
+    });
+
+    passwordConfirmation.addEventListener("focus", function () {
+        matchRequirements.style.display = "block";
+    });
+
+    passwordConfirmation.addEventListener("blur", function () {
+        matchRequirements.style.display = "none";
+    });
+
+    togglePassword.addEventListener("click", function () {
+        const type = password.getAttribute("type") === "password" ? "text" : "password";
+        password.setAttribute("type", type);
+        this.classList.toggle("fa-eye-slash");
+    });
+
+    togglePasswordConfirmation.addEventListener("click", function () {
+        const type = passwordConfirmation.getAttribute("type") === "password" ? "text" : "password";
+        passwordConfirmation.setAttribute("type", type);
+        this.classList.toggle("fa-eye-slash");
+    });
+
+    togglePassword.addEventListener("mousedown", function (event) {
+        event.preventDefault(); // Evita que el campo de contraseña pierda el foco
+    });
+
+    togglePasswordConfirmation.addEventListener("mousedown", function (event) {
+        event.preventDefault(); // Evita que el campo de contraseña pierda el foco
+    });
+
+    submitBtn.addEventListener("mousedown", function (event) {
+        event.preventDefault(); // Evita que el campo de contraseña pierda el foco
+    });
+
+    password.addEventListener("input", function () {
+        const value = password.value;
+        const lengthValid = value.length >= 8 && value.length <= 32;
+        const uppercaseValid = /[A-Z]/.test(value);
+        const lowercaseValid = /[a-z]/.test(value);
+        const numberValid = /[0-9]/.test(value);
+        const specialValid = /[@$!%*?&]/.test(value);
+
+        updateRequirement(lengthRequirement, lengthValid);
+        updateRequirement(uppercaseRequirement, uppercaseValid);
+        updateRequirement(lowercaseRequirement, lowercaseValid);
+        updateRequirement(numberRequirement, numberValid);
+        updateRequirement(specialRequirement, specialValid);
+    });
+
+    passwordConfirmation.addEventListener("input", function () {
+        const matchValid = password.value === passwordConfirmation.value;
+        updateRequirement(matchRequirement, matchValid);
+    });
+
+    function updateRequirement(element, isValid) {
+        const icon = element.querySelector('i');
+        if (isValid) {
+            element.classList.add("valid");
+            element.classList.remove("invalid");
+            icon.style.display = 'inline';
+        } else {
+            element.classList.remove("valid");
+            element.classList.add("invalid");
+            icon.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const elements = document.querySelectorAll('input, select, textarea');
+        elements.forEach(function (element) {
+            element.addEventListener('invalid', function (e) {
+                // Restablecer el mensaje de error por defecto del navegador
+                e.target.setCustomValidity('');
+
+                if (!e.target.validity.valid) {
+                    switch (e.target.id) {
+                        case 'email':
+                            e.target.setCustomValidity('Por favor, introduce una dirección de correo electrónico válida.');
+                            break;
+                        // Otros casos de validación personalizados aquí
+                    }
+                }
+            });
+        });
+    });
+</script>

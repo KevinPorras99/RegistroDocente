@@ -62,4 +62,36 @@
 
 
 
-<script src="{{ asset('js/login.script.js') }}"></script>
+<script>
+    //Funcionalidad para mostrar u ocultar la contraseña
+    document.addEventListener('DOMContentLoaded', function () {
+        var form = document.getElementById('forgot-password-form');
+        var submitBtn = document.getElementById('submitBtn');
+        var successAlert = document.getElementById('success-alert');
+        var errorAlert = document.getElementById('error-alert');
+
+        form.addEventListener('submit', function () {
+            submitBtn.disabled = true;
+        });
+
+        // Función para ocultar el mensaje de éxito después de 3 segundos
+        if (successAlert) {
+            setTimeout(function () {
+                successAlert.style.opacity = '0';
+                setTimeout(function () {
+                    successAlert.remove();
+                }, 500);
+            }, 3000);
+        }
+
+        // Función para ocultar el mensaje de error después de 5 segundos
+        if (errorAlert) {
+            setTimeout(function () {
+                errorAlert.style.opacity = '0';
+                setTimeout(function () {
+                    errorAlert.remove();
+                }, 500);
+            }, 5000);
+        }
+    });
+</script>
