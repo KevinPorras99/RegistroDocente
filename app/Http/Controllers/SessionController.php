@@ -16,21 +16,21 @@ use Illuminate\Support\Facades\Storage;
 
 
 class SessionController extends Controller {
-    
-    
+
+
     public function create() {
         return view('auth.login'); // Vista sencilla para el login
     }
 
     public function store(Request $request) {
         $credentials = $request->only('email', 'password');
-    
+
         if (Auth::attempt($credentials) == false) {
             return back()->withErrors([
                 'message' => 'El correo electrónico o la contraseña son incorrectos, inténtalo de nuevo.',
             ]);
         }
-    
+
         // Redirigir a la página principal después de un login exitoso
         return redirect()->route('home');
     }
@@ -42,8 +42,8 @@ class SessionController extends Controller {
     }
 
     public function ForgotPasswordView() {
-        $token = ""; 
-    
+        $token = "";
+
         return view('auth.forgotPassword', compact('token'));
     }
 
@@ -55,21 +55,21 @@ class SessionController extends Controller {
             'email.email' => "Correo electrónico no válido.",
             'email.exists' => "Este correo no corresponde a ningún usuario registrado.",
         ]);
-    
+
         $token = Str::random(64);
-    
+
         DB::table('password_reset_tokens')->updateOrInsert(
             ['email' => $request->email],
             ['token' => $token, 'created_at' => now()]
         );
-    
+
         $user = User::where('email', $request->email)->first();
-    
+
         Mail::to($user)->send(new resetPasswordMail($token));
-    
-        return back()->with('status', 'Revisa tu correo electrónico. 
+
+        return back()->with('status', 'Revisa tu correo electrónico.
         Se han enviado instrucciones para restablecer tu contraseña.');
-    }    
+    }
 
     public function showResetForm($token) {
         return view('auth.changePassword', compact('token'));
@@ -87,25 +87,25 @@ class SessionController extends Controller {
             ],
             'password_confirmation' => 'required'
         ]);
-    
+
         $updatePassword = DB::table('password_reset_tokens')
             ->where([
                 'email' => $request->email,
                 'token' => $request->token
             ])->first();
-    
+
         if (!$updatePassword) {
             return back()->withErrors(['email' => 'El enlace de cambio de contraseña es inválido o ya ha sido utilizado.']);
         }
-    
+
         User::where('email', $request->email)
             ->update(['password' => Hash::make($request->password)]);
-    
+
         DB::table('password_reset_tokens')->where(['email' => $request->email])->delete();
-    
+
         return redirect()->to(route('login.index'))->with('success', 'Se ha cambiado la contraseña de manera correcta');
-    } 
-    
+    }
+
     public function uploadProfileImage(Request $request)
     {
         $request->validate([
@@ -148,7 +148,13 @@ class SessionController extends Controller {
         $user = Auth::user(); // Obtén el usuario autenticado
         return view('estudiantes', ['user' => $user]); // Pasa el usuario a la vista// Pasa los datos a la vista si es necesario
     }
-    
+
+    public function cursos()
+    {
+        $user = Auth::user(); // Obtén el usuario autenticado
+        return view('cursos', ['user' => $user]); // Pasa el usuario a la vista// Pasa los datos a la vista si es necesario
+    }
+
     public function destroy() {
         Auth::logout();
         return redirect()->to('/');
