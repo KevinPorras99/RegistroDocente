@@ -311,3 +311,61 @@ body {
     }
 
 }
+
+@media (min-width: 2500px) {
+    .login-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        background-color: #ffffff;
+        border-radius: 12px;
+    }
+
+    .login-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .login-form input[type="text"],
+    .login-form input[type="password"],
+    .login-form input[type="email"] {
+        width: 100%;
+        max-width: 700px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    .login-form button[type="submit"] {
+        width: 100%;
+        max-width: 700px;
+        padding: 15px;
+        background-color: #4e73df;
+        color: #ffffff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .login-form button[type="submit"]:hover {
+        background-color: #2e59d9;
+    }
+
+    .login-form .forgot-password {
+        margin-top: 15px;
+        text-align: center;
+    }
+
+    .login-form .forgot-password a {
+        color: #4e73df;
+        text-decoration: none;
+    }
+
+    .login-form .forgot-password a:hover {
+        text-decoration: underline;
+    }
+}
