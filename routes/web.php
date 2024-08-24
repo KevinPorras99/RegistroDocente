@@ -5,6 +5,8 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\CursoController; // Importar el controlador CursoController
 
 // Vista por defecto redirigida a login
 Route::get('/', function () {
@@ -26,6 +28,9 @@ Route::get('/home', [SessionController::class, 'home'])->middleware('auth')->nam
 
 Route::get('/estudiantes', [StudentController::class, 'index'])->name('estudiantes');
 Route::post('/estudiantes', [StudentController::class, 'store'])->name('students.store_student');
+Route::get('/cursos', [CursoController::class, 'index'])->name('cursos'); // Ruta para listar cursos
+Route::get('/cursos/create', [CursoController::class, 'create'])->name('cursos.create'); // Ruta para crear un curso
+Route::post('/cursos', [CursoController::class, 'store'])->name('cursos.store'); // Ruta para almacenar un curso
 
 Route::post('/profile/upload', [SessionController::class, 'uploadProfileImage'])->name('profile.upload');
 Route::delete('/profile/delete', [SessionController::class, 'deleteProfileImage'])->name('profile.delete');
