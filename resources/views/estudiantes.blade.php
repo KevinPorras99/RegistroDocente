@@ -8,13 +8,18 @@
 
 @section('content')
     <div class="content">
-        <h1>Estudiantes</h1>
+        <h1><i class="fas fa-user-graduate"></i> Estudiantes</h1>
         <p>Selecciona una opción del menú para comenzar.</p>
         
-        <!-- Botón para agregar estudiante -->
-        <button class="btn btn-primary" onclick="openAddStudentModal()">
-            <i class="fas fa-plus"></i> Agregar estudiante
-        </button>
+        <!-- Barra de búsqueda y botón para agregar estudiante -->
+        <div class="d-flex mb-3">
+            <form action="{{ route('students.index') }}" method="GET" class="mr-2">
+                <input type="text" name="search" placeholder="Buscar estudiantes..." class="form-control" style="width: 300px;">
+            </form>
+            <button class="btn btn-primary ml-auto" onclick="openAddStudentModal()">
+                <i class="fas fa-plus"></i> Agregar estudiante
+            </button>
+        </div>
 
         <!-- Modal para agregar estudiante -->
         <div id="addStudentModal" class="modal" style="display: none;">
@@ -77,7 +82,7 @@
                             <td>{{ $student->section }}</td>
                             <td>
                                 <a href="{{ route('students.show', $student->id) }}" class="btn btn-sm" style="background-color: transparent;">
-                                    <i class="fas fa-eye" style="color: gray;"></i>
+                                    <i class="fas fa-eye" style="color: rgb(81, 105, 243);"></i>
                                 </a>
                                 <a href="{{ route('students.edit', $student->id) }}" class="btn btn-sm" style="background-color: transparent;">
                                     <i class="fas fa-pencil-alt" style="color: green;"></i>

@@ -8,7 +8,7 @@
 
 @section('content')
     <div class="content">
-        <h1>Cursos</h1>
+        <h1><i class="fas fa-book"></i> Cursos</h1>
         
         <!-- Aquí puedes añadir el contenido correspondiente a cada sección -->
         <!-- Barra de búsqueda y botón de agregar curso -->

@@ -8,7 +8,7 @@
 
 @section('content')
     <div class="content">
-        <h1>Inicio</h1>
+        <h1><i class="fas fa-home"></i> Inicio</h1>
         <p>Bienvenido al sistema de registro docente.</p>
     </div>
 @endsection
