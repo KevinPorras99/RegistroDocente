@@ -389,6 +389,24 @@ body, html {
     margin-top: 10px;
 }
 
+.pagination .page-item .page-link {
+    padding: 10px 15px; /* Ajusta el tamaño de los botones */
+    font-size: 14px;     /* Ajusta el tamaño del texto */
+    margin: 0 5px;       /* Añade espacio entre los botones */
+    border-radius: 5px;  /* Añade bordes redondeados */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Asegúrate de que el modal esté por encima de otros elementos */
+.modal {
+    z-index: 1050; /* Bootstrap modals usually have a z-index of 1050 */
+}
+
+.modal-backdrop {
+    z-index: 1040; /* The backdrop should be just below the modal */
+}
 
 /* Media Queries */
 @media (max-width: 768px) {
