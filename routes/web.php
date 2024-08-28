@@ -5,17 +5,19 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\CourseController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\CursoController; // Importar el controlador CursoController
 
 // Vista por defecto redirigida a login
 Route::get('/', function () {
     return redirect()->route('login.index');
 })->middleware('guest');
 
-
 Route::resource('students', StudentController::class)->middleware('auth');
+Route::get('/estudiantes', [StudentController::class, 'index'])->name('estudiantes');
 
+Route::resource('courses', CourseController::class)->middleware('auth');
+Route::get('/cursos', [CourseController::class, 'index'])->name('cursos');
 
 Route::get('/login', [SessionController::class, 'create'])->middleware('guest')->name('login.index');
 Route::post('/login', [SessionController::class, 'store'])->name('login.store');
@@ -28,16 +30,8 @@ Route::get('/register', [RegisterController::class, 'create'])->middleware('gues
 Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
 Route::get('/home', [SessionController::class, 'home'])->middleware('auth')->name('home');
 
-Route::resource('students', StudentController::class)->middleware('auth');
-Route::get('/estudiantes', [StudentController::class, 'index'])->name('estudiantes');
-
-Route::get('/cursos', [CursoController::class, 'index'])->name('cursos'); // Ruta para listar cursos
-Route::get('/cursos/create', [CursoController::class, 'create'])->name('cursos.create'); // Ruta para crear un curso
-Route::post('/cursos', [CursoController::class, 'store'])->name('cursos.store'); // Ruta para almacenar un curso
-
 Route::post('/profile/upload', [SessionController::class, 'uploadProfileImage'])->name('profile.upload')->middleware('auth');
 Route::delete('/profile/delete', [SessionController::class, 'deleteProfileImage'])->name('profile.delete')->middleware('auth');
-
 
 // Página de inicio (home) después de autenticarse
 //Route::get('/home', function () {

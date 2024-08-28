@@ -4,29 +4,21 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCursosTable extends Migration
+class CreateCursosTable extends Migration // Cambia el nombre de la clase aquí
 {
-    /**
-     * Ejecuta las migraciones.
-     *
-     * @return void
-     */
-    public function up()
-    {
-        Schema::create('cursos', function (Blueprint $table) {
-            $table->id(); // Campo de clave primaria autoincremental
-            $table->string('nombre'); // Campo para el nombre del curso
-            $table->timestamps(); // Campos para created_at y updated_at
+    public function up() {
+        Schema::create('courses', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('grade');
+            $table->string('institution');
+            $table->string('classroom');
+            $table->unsignedBigInteger('user_id')->nullable(); // Permitir valores nulos
+            $table->timestamps();
         });
     }
 
-    /**
-     * Reversa las migraciones.
-     *
-     * @return void
-     */
-    public function down()
-    {
-        Schema::dropIfExists('cursos');
+    public function down() {
+        Schema::dropIfExists('courses');
     }
 }
