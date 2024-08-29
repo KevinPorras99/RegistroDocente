@@ -14,8 +14,9 @@
         <!-- Barra de búsqueda y botón para agregar curso -->
         <div class="d-flex flex-wrap mb-3">
             <form action="{{ route('courses.index') }}" method="GET" class="mr-2 flex-grow-1 d-flex">
-                <input type="text" name="search" placeholder="Buscar cursos..." class="form-control" style="width: 80%;">
+                <input type="text" name="search" placeholder="Buscar cursos..." class="form-control" style="width: 60%;">
                 <button type="submit" class="btn btn-primary ml-2 mt-md-0">Buscar</button>
+                <button type="submit" class="btn btn-primary ml-2 mt-md-0">Borrar Filtros</button>
             </form>
             <button class="btn btn-primary ml-auto mt-2 mt-md-0" onclick="openAddCourseModal()">
                 <i class="fas fa-plus"></i> Agregar curso

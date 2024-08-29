@@ -14,7 +14,7 @@
         <!-- Barra de búsqueda y botón para agregar tarea -->
         <div class="d-flex flex-wrap mb-3">
             <form action="{{ route('tasks.index') }}" method="GET" class="mr-2 flex-grow-1 d-flex">
-                <input type="text" name="search" placeholder="Buscar tareas..." class="form-control" style="width: 80%;">
+                <input type="text" name="search" placeholder="Buscar tareas..." class="form-control" style="width: 60%;">
                 <button type="submit" class="btn btn-primary ml-2 mt-md-0">Buscar</button>
                 <button type="submit" class="btn btn-primary ml-2 mt-md-0">Borrar Filtros</button>
             </form>
