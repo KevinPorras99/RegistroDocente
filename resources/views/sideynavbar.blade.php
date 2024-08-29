@@ -23,7 +23,7 @@
             <a href="{{ route('estudiantes') }}"><i class="fas fa-user-graduate"></i> <span> Estudiantes</span></a>
             <a href="#trabajo-cotidiano"><i class="fas fa-briefcase"></i> <span> Trabajo Cotidiano</span></a>
             <a href="#pruebas-examenes"><i class="fas fa-file-alt"></i> <span> Pruebas o Exámenes</span></a>
-            <a href="#tareas-asignaciones"><i class="fas fa-tasks"></i> <span> Tareas o Asignaciones</span></a>
+            <a href="{{ route('tareasyasignaciones') }}"><i class="fas fa-tasks"></i> <span> Tareas o Asignaciones</span></a>
             <a href="#conducta-desempeno"><i class="fas fa-user-check"></i> <span> Conducta y Desempeño</span></a>
             <a href="#asistencia"><i class="fas fa-calendar-check"></i> <span> Asistencia</span></a>
             <a href="#calificaciones"><i class="fas fa-chart-line"></i> <span> Calificaciones</span></a>

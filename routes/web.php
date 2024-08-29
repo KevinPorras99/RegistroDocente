@@ -7,6 +7,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\TaskController;
 
 // Vista por defecto redirigida a login
 Route::get('/', function () {
@@ -18,6 +19,9 @@ Route::get('/estudiantes', [StudentController::class, 'index'])->name('estudiant
 
 Route::resource('courses', CourseController::class)->middleware('auth');
 Route::get('/cursos', [CourseController::class, 'index'])->name('cursos');
+
+Route::resource('tasks', TaskController::class)->middleware('auth');
+Route::get('/tareasyasignaciones', [TaskController::class, 'index'])->name('tareasyasignaciones');
 
 Route::get('/login', [SessionController::class, 'create'])->middleware('guest')->name('login.index');
 Route::post('/login', [SessionController::class, 'store'])->name('login.store');
