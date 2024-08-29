@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\Student;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\StudentsImport;
+use App\Exports\StudentsTemplateExport;
 
 
 class StudentController extends Controller
@@ -32,6 +35,7 @@ class StudentController extends Controller
 
         return view('estudiantes', compact('students', 'user'));
     }
+    
 
     public function store(Request $request) {
         // Validar los datos del formulario
@@ -89,5 +93,31 @@ class StudentController extends Controller
             $student->delete();
         }
         return redirect()->route('students.index');
+    }
+
+    // Método para descargar la plantilla
+    public function downloadTemplate()
+    {
+        return Excel::download(new StudentsTemplateExport, 'Plantilla_Estudiantes.xlsx');
+    }
+
+    // Carga del archivo Excel
+    public function uploadExcel(Request $request)
+    {
+    $request->validate([
+        'file' => 'required|mimes:xlsx'
+    ]);
+
+    $userId = Auth::id(); // Obtener el ID del usuario autenticado
+
+    Excel::import(new StudentsImport($userId), $request->file('file'));
+
+    return redirect()->route('students.index')->with('success', 'Estudiantes importados exitosamente.');
+    }
+
+    public function show($id)
+    {
+        $student = Student::findOrFail($id);
+        return view('students.show', compact('student'));
     }
 }

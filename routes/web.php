@@ -37,6 +37,8 @@ Route::get('/home', [SessionController::class, 'home'])->middleware('auth')->nam
 Route::post('/profile/upload', [SessionController::class, 'uploadProfileImage'])->name('profile.upload')->middleware('auth');
 Route::delete('/profile/delete', [SessionController::class, 'deleteProfileImage'])->name('profile.delete')->middleware('auth');
 
+Route::get('/estudiantes/download-template', [StudentController::class, 'downloadTemplate'])->name('students.downloadTemplate');
+Route::post('/estudiantes/upload-excel', [StudentController::class, 'uploadExcel'])->name('students.uploadExcel');
 // Página de inicio (home) después de autenticarse
 //Route::get('/home', function () {
 //    return view('home');

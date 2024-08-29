@@ -23,6 +23,21 @@
             </button>
         </div>
 
+        <!-- Botones para descargar plantilla y cargar archivo -->
+        <div class="d-flex justify-content-between mb-3">
+            <button class="btn btn-success" onclick="location.href='{{ route('students.downloadTemplate') }}'">
+                Descargar plantilla
+            </button>
+            <form action="{{ route('students.uploadExcel') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="input-group">
+                    <input type="file" name="file" class="form-control" required>
+                    <button type="submit" class="btn btn-primary ml-2">Cargar archivo</button>
+                </div>
+            </form>
+        </div>
+
+
         <!-- Modal para agregar estudiante -->
         <div id="addStudentModal" class="modal" style="display: none;">
             <div class="modal-dialog">
