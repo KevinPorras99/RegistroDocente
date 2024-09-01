@@ -6,6 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Exports\\StudentsTemplateExport' => $baseDir . '/app/Exports/StudentsTemplateExport.php',
     'App\\Http\\Controllers\\Controller' => $baseDir . '/app/Http/Controllers/Controller.php',
     'App\\Http\\Controllers\\CourseController' => $baseDir . '/app/Http/Controllers/CourseController.php',
     'App\\Http\\Controllers\\HomeController' => $baseDir . '/app/Http/Controllers/HomeController.php',
@@ -13,6 +14,7 @@ return array(
     'App\\Http\\Controllers\\SessionController' => $baseDir . '/app/Http/Controllers/SessionController.php',
     'App\\Http\\Controllers\\StudentController' => $baseDir . '/app/Http/Controllers/StudentController.php',
     'App\\Http\\Controllers\\TaskController' => $baseDir . '/app/Http/Controllers/TaskController.php',
+    'App\\Imports\\StudentsImport' => $baseDir . '/app/Imports/StudentsImport.php',
     'App\\Mail\\confirmationMail' => $baseDir . '/app/Mail/confirmationMail.php',
     'App\\Mail\\resetPasswordMail' => $baseDir . '/app/Mail/resetPasswordMail.php',
     'App\\Models\\Course' => $baseDir . '/app/Models/Course.php',
@@ -107,7 +109,6 @@ return array(
     'Carbon\\PHPStan\\AbstractMacro' => $vendorDir . '/nesbot/carbon/src/Carbon/PHPStan/AbstractMacro.php',
     'Carbon\\PHPStan\\Macro' => $vendorDir . '/nesbot/carbon/src/Carbon/PHPStan/Macro.php',
     'Carbon\\PHPStan\\MacroExtension' => $vendorDir . '/nesbot/carbon/src/Carbon/PHPStan/MacroExtension.php',
-    'Carbon\\PHPStan\\MacroMethodReflection' => $vendorDir . '/nesbot/carbon/src/Carbon/PHPStan/MacroMethodReflection.php',
     'Carbon\\PHPStan\\MacroScanner' => $vendorDir . '/nesbot/carbon/src/Carbon/PHPStan/MacroScanner.php',
     'Carbon\\Traits\\Boundaries' => $vendorDir . '/nesbot/carbon/src/Carbon/Traits/Boundaries.php',
     'Carbon\\Traits\\Cast' => $vendorDir . '/nesbot/carbon/src/Carbon/Traits/Cast.php',

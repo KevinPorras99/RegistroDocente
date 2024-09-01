@@ -8,6 +8,8 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\DailyWorkController;
+use App\Http\Controllers\ExamController;
 
 // Vista por defecto redirigida a login
 Route::get('/', function () {
@@ -22,6 +24,12 @@ Route::get('/cursos', [CourseController::class, 'index'])->name('cursos');
 
 Route::resource('tasks', TaskController::class)->middleware('auth');
 Route::get('/tareasyasignaciones', [TaskController::class, 'index'])->name('tareasyasignaciones');
+
+Route::resource('dailyWorks', DailyWorkController::class)->middleware('auth');
+Route::get('/trabajocotidiano', [DailyWorkController::class, 'index'])->name('trabajocotidiano');
+
+Route::resource('exams', ExamController::class)->middleware('auth');
+Route::get('/examenes', [ExamController::class, 'index'])->name('examenes');
 
 Route::get('/login', [SessionController::class, 'create'])->middleware('guest')->name('login.index');
 Route::post('/login', [SessionController::class, 'store'])->name('login.store');
