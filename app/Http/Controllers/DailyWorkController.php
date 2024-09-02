@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\DailyWork;
+use App\Models\Course; // Importar el modelo Course
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 
 class DailyWorkController extends Controller
@@ -29,7 +29,9 @@ class DailyWorkController extends Controller
             })
             ->paginate(5); // Paginación con 5 registros por página
 
-        return view('trabajocotidiano', compact('dailyWorks', 'user'));
+        $courses = Course::all(); // Obtener todos los cursos
+
+        return view('trabajocotidiano', compact('dailyWorks', 'user', 'courses'));
     }
 
     public function store(Request $request) {

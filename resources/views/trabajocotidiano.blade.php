@@ -8,7 +8,22 @@
 
 @section('content')
     <div class="content">
-        <h1><i class="fas fa-briefcase"></i> Trabajo Cotidiano</h1>
+        <h1>
+            <i class="fas fa-briefcase"></i> Trabajo Cotidiano
+            <div class="d-inline-block ml-3">
+                <select id="courseSelect" class="form-control d-inline-block" style="width: 300px;" onchange="updateCycleOptions()">
+                    <option value="">Seleccione un curso</option>
+                    @foreach($courses as $course)
+                        <option value="{{ $course->id }}" data-cycles="{{ $course->cycle }}">
+                            {{ $course->name }} - {{ $course->grade }} - {{ $course->institution }} - {{ $course->classroom }}
+                        </option>
+                    @endforeach
+                </select>
+                <select id="cycleSelect" class="form-control d-inline-block ml-2" style="width: 150px;">
+                    <option value="">Seleccione un ciclo</option>
+                </select>
+            </div>
+        </h1>
         <p>Selecciona alguna palabra clave para poner en la barra de búsqueda y presiona Enter</p>
 
         <!-- Barra de búsqueda y botón para agregar trabajo cotidiano -->
@@ -193,22 +208,95 @@
     }
 
     function openEditDailyWorkModal(dailyWork) {
-    var formAction = `{{ route('dailyWorks.update', ':id') }}`;
-    formAction = formAction.replace(':id', dailyWork.id);
-    document.getElementById('editDailyWorkForm').action = formAction;
+        var formAction = `{{ route('dailyWorks.update', ':id') }}`;
+        formAction = formAction.replace(':id', dailyWork.id);
+        document.getElementById('editDailyWorkForm').action = formAction;
 
-    document.getElementById('edit-name').value = dailyWork.name;
-    document.getElementById('edit-description').value = dailyWork.description;
-    document.getElementById('edit-due_date').value = dailyWork.due_date;
+        document.getElementById('edit-name').value = dailyWork.name;
+        document.getElementById('edit-description').value = dailyWork.description;
+        document.getElementById('edit-due_date').value = dailyWork.due_date;
 
-    // Limpiar el campo de archivo
-    document.getElementById('edit-file').value = '';
+        // Limpiar el campo de archivo
+        document.getElementById('edit-file').value = '';
 
-    document.getElementById('editDailyWorkModal').style.display = 'block';
+        document.getElementById('editDailyWorkModal').style.display = 'block';
     }
 
     function closeEditDailyWorkModal() {
         document.getElementById('editDailyWorkModal').style.display = 'none';
     }
+
+    function updateCycleOptions() {
+    var courseSelect = document.getElementById('courseSelect');
+    var cycleSelect = document.getElementById('cycleSelect');
+    var selectedCourse = courseSelect.options[courseSelect.selectedIndex];
+    var cycles = selectedCourse.getAttribute('data-cycles');
+
+    // Limpiar las opciones del ciclo
+    cycleSelect.innerHTML = '<option value="">Seleccione un ciclo</option>';
+
+    // Añadir la opción "Todos"
+    var optionTodos = document.createElement('option');
+    optionTodos.value = 'Todos';
+    optionTodos.text = 'Todos';
+    cycleSelect.appendChild(optionTodos);
+
+    if (cycles) {
+        var cycleOptions = cycles.split(',');
+        cycleOptions.forEach(function(cycle) {
+            if (cycle.toLowerCase() === 'semestre') {
+                var option1 = document.createElement('option');
+                option1.value = 'Primer Semestre';
+                option1.text = 'Primer Semestre';
+                cycleSelect.appendChild(option1);
+
+                var option2 = document.createElement('option');
+                option2.value = 'Segundo Semestre';
+                option2.text = 'Segundo Semestre';
+                cycleSelect.appendChild(option2);
+            } else if (cycle.toLowerCase() === 'trimestre') {
+                var option1 = document.createElement('option');
+                option1.value = 'Primer Trimestre';
+                option1.text = 'Primer Trimestre';
+                cycleSelect.appendChild(option1);
+
+                var option2 = document.createElement('option');
+                option2.value = 'Segundo Trimestre';
+                option2.text = 'Segundo Trimestre';
+                cycleSelect.appendChild(option2);
+
+                var option3 = document.createElement('option');
+                option3.value = 'Tercer Trimestre';
+                option3.text = 'Tercer Trimestre';
+                cycleSelect.appendChild(option3);
+            } else if (cycle.toLowerCase() === 'cuatrimestre') {
+                var option1 = document.createElement('option');
+                option1.value = 'Primer Cuatrimestre';
+                option1.text = 'Primer Cuatrimestre';
+                cycleSelect.appendChild(option1);
+
+                var option2 = document.createElement('option');
+                option2.value = 'Segundo Cuatrimestre';
+                option2.text = 'Segundo Cuatrimestre';
+                cycleSelect.appendChild(option2);
+
+                var option3 = document.createElement('option');
+                option3.value = 'Tercer Cuatrimestre';
+                option3.text = 'Tercer Cuatrimestre';
+                cycleSelect.appendChild(option3);
+
+                var option4 = document.createElement('option');
+                option4.value = 'Cuarto Cuatrimestre';
+                option4.text = 'Cuarto Cuatrimestre';
+                cycleSelect.appendChild(option4);
+            } else {
+                var option = document.createElement('option');
+                option.value = cycle;
+                option.text = cycle;
+                cycleSelect.appendChild(option);
+            }
+        });
+    }
+}
 </script>
 @endsection
