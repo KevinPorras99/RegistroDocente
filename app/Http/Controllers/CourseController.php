@@ -25,7 +25,8 @@ class CourseController extends Controller
                 return $query->where('name', 'like', "%{$search}%")
                              ->orWhere('grade', 'like', "%{$search}%")
                              ->orWhere('institution', 'like', "%{$search}%")
-                             ->orWhere('classroom', 'like', "%{$search}%");
+                             ->orWhere('classroom', 'like', "%{$search}%")
+                             ->orWhere('cycle', 'like', "%{$search}%");
             })
             ->paginate(5); // Paginación con 5 registros por página
 
@@ -38,6 +39,7 @@ class CourseController extends Controller
             'name' => 'required|string|max:255',
             'grade' => 'required|string|max:255',
             'institution' => 'required|string|max:255',
+            'cycle' => 'required|string|in:Trimestre,Cuatrimestre,Semestre',
             'classroom' => 'required|string|max:255',
         ]);
 
@@ -47,6 +49,7 @@ class CourseController extends Controller
         $course->grade = $request->input('grade');
         $course->institution = $request->input('institution');
         $course->classroom = $request->input('classroom');
+        $course->cycle = $request->input('cycle');
         $course->user_id = Auth::id(); // Asociar el curso con el usuario autenticado
         $course->save();
 
@@ -63,6 +66,7 @@ class CourseController extends Controller
             'name' => 'required|string|max:255',
             'grade' => 'required|string|max:255',
             'institution' => 'required|string|max:255',
+            'cycle' => 'required|string|in:Trimestre,Cuatrimestre,Semestre',
             'classroom' => 'required|string|max:255',
         ]);
 
@@ -71,6 +75,7 @@ class CourseController extends Controller
         $course->grade = $request->input('grade');
         $course->institution = $request->input('institution');
         $course->classroom = $request->input('classroom');
+        $course->cycle = $request->input('cycle');
         $course->save();
 
         // Redirigir a la lista de cursos con un mensaje de éxito

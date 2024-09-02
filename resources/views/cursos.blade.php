@@ -50,6 +50,14 @@
                                 <label for="classroom">Aula</label>
                                 <input type="text" class="form-control" id="add-classroom" name="classroom" required>
                             </div>
+                            <div class="form-group">
+                                <label for="cycle">Ciclo</label>
+                                <select class="form-control" id="add-cycle" name="cycle" required>
+                                    <option value="Trimestre">Trimestre</option>
+                                    <option value="Cuatrimestre">Cuatrimestre</option>
+                                    <option value="Semestre">Semestre</option>
+                                </select>
+                            </div>
                             <button type="submit" class="btn btn-primary">Agregar</button>
                         </form>
                     </div>
@@ -57,12 +65,12 @@
             </div>
         </div>
 
-        <!-- Modal para visualizar curso -->
+        <!-- Modal para ver curso -->
         <div id="viewCourseModal" class="modal" style="display: none;">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Visualizar Curso</h5>
+                        <h5 class="modal-title">Detalles del Curso</h5>
                         <button type="button" class="close" onclick="closeViewCourseModal()">&times;</button>
                     </div>
                     <div class="modal-body">
@@ -70,6 +78,7 @@
                         <p><strong>Grado:</strong> <span id="viewGrade"></span></p>
                         <p><strong>Institución:</strong> <span id="viewInstitution"></span></p>
                         <p><strong>Aula:</strong> <span id="viewClassroom"></span></p>
+                        <p><strong>Ciclo:</strong> <span id="viewCycle"></span></p>
                     </div>
                 </div>
             </div>
@@ -103,6 +112,14 @@
                                 <label for="classroom">Aula</label>
                                 <input type="text" class="form-control" id="edit-classroom" name="classroom" required>
                             </div>
+                            <div class="form-group">
+                                <label for="cycle">Ciclo</label>
+                                <select class="form-control" id="edit-cycle" name="cycle" required>
+                                    <option value="Trimestre">Trimestre</option>
+                                    <option value="Cuatrimestre">Cuatrimestre</option>
+                                    <option value="Semestre">Semestre</option>
+                                </select>
+                            </div>
                             <button type="submit" class="btn btn-primary">Actualizar</button>
                         </form>
                     </div>
@@ -122,10 +139,11 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Nombre</th>
+                            <th>Nombre del Curso</th>
                             <th>Grado</th>
                             <th>Institución</th>
                             <th>Aula</th>
+                            <th>Ciclo</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -136,6 +154,7 @@
                                 <td>{{ $course->grade }}</td>
                                 <td>{{ $course->institution }}</td>
                                 <td>{{ $course->classroom }}</td>
+                                <td>{{ $course->cycle }}</td>
                                 <td>
                                     <button class="btn btn-sm" style="background-color: transparent;" onclick="openViewCourseModal({{ json_encode($course) }})">
                                         <i class="fas fa-eye" style="color: rgb(80, 125, 252); font-size: 1rem;"></i>
@@ -154,7 +173,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center">No hay cursos registrados.</td>
+                                <td colspan="6" class="text-center">No hay cursos registrados.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -187,6 +206,7 @@
             document.getElementById('viewGrade').innerText = course.grade;
             document.getElementById('viewInstitution').innerText = course.institution;
             document.getElementById('viewClassroom').innerText = course.classroom;
+            document.getElementById('viewCycle').innerText = course.cycle;
             document.getElementById('viewCourseModal').style.display = 'block';
         }
 
@@ -203,6 +223,7 @@
             document.getElementById('edit-grade').value = course.grade;
             document.getElementById('edit-institution').value = course.institution;
             document.getElementById('edit-classroom').value = course.classroom;
+            document.getElementById('edit-cycle').value = course.cycle;
 
             document.getElementById('editCourseModal').style.display = 'block';
         }

@@ -8,7 +8,7 @@
 
 @section('content')
     <div class="content">
-        <h1><i class="fas fa-tasks"></i> Pruebas o Exámenes</h1>
+        <h1><i class="fas fa-file-alt"></i> Pruebas o Exámenes</h1>
         <p>Selecciona alguna palabra clave para poner en la barra de búsqueda y presiona Enter</p>
 
         <!-- Barra de búsqueda y botón para agregar examen -->
@@ -121,7 +121,7 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Nombre</th>
+                            <th>Nombre del Examen</th>
                             <th>Descripción</th>
                             <th>Fecha de Entrega</th>
                             <th>Archivo</th>

@@ -8,7 +8,7 @@
 
 @section('content')
     <div class="content">
-        <h1><i class="fas fa-tasks"></i> Trabajo Cotidiano</h1>
+        <h1><i class="fas fa-briefcase"></i> Trabajo Cotidiano</h1>
         <p>Selecciona alguna palabra clave para poner en la barra de búsqueda y presiona Enter</p>
 
         <!-- Barra de búsqueda y botón para agregar trabajo cotidiano -->
@@ -117,7 +117,7 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Nombre</th>
+                            <th>Nombre del Trabajo</th>
                             <th>Descripción</th>
                             <th>Fecha de Entrega</th>
                             <th>Archivo</th>
