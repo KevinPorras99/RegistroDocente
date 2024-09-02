@@ -47,7 +47,7 @@
                                 <input type="text" class="form-control" id="add-institution" name="institution" required>
                             </div>
                             <div class="form-group">
-                                <label for="classroom">Aula</label>
+                                <label for="classroom">Grupo</label>
                                 <input type="text" class="form-control" id="add-classroom" name="classroom" required>
                             </div>
                             <div class="form-group">
@@ -77,7 +77,7 @@
                         <p><strong>Nombre:</strong> <span id="viewName"></span></p>
                         <p><strong>Grado:</strong> <span id="viewGrade"></span></p>
                         <p><strong>Institución:</strong> <span id="viewInstitution"></span></p>
-                        <p><strong>Aula:</strong> <span id="viewClassroom"></span></p>
+                        <p><strong>Grupo:</strong> <span id="viewClassroom"></span></p>
                         <p><strong>Ciclo:</strong> <span id="viewCycle"></span></p>
                     </div>
                 </div>
@@ -109,7 +109,7 @@
                                 <input type="text" class="form-control" id="edit-institution" name="institution" required>
                             </div>
                             <div class="form-group">
-                                <label for="classroom">Aula</label>
+                                <label for="classroom">Grupo</label>
                                 <input type="text" class="form-control" id="edit-classroom" name="classroom" required>
                             </div>
                             <div class="form-group">
@@ -142,7 +142,7 @@
                             <th>Nombre del Curso</th>
                             <th>Grado</th>
                             <th>Institución</th>
-                            <th>Aula</th>
+                            <th>Grupo</th>
                             <th>Ciclo</th>
                             <th>Acciones</th>
                         </tr>

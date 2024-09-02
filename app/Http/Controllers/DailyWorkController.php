@@ -40,6 +40,8 @@ class DailyWorkController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
             'due_date' => 'required|date',
+            'course_id' => 'required|exists:courses,id',
+            'cycle' => 'required|string',
             'file' => 'nullable|file|mimes:pdf,txt,doc,docx|max:2048',
         ]);
 
@@ -48,7 +50,10 @@ class DailyWorkController extends Controller
         $dailyWork->name = $request->input('name');
         $dailyWork->description = $request->input('description');
         $dailyWork->due_date = $request->input('due_date');
+        $dailyWork->course_id = $request->input('course_id');
+        $dailyWork->cycle = $request->input('cycle');
         $dailyWork->user_id = Auth::id(); // Asociar el trabajo cotidiano con el usuario autenticado
+
         // Manejar la subida de archivos
         if ($request->hasFile('file')) {
             $file = $request->file('file');
@@ -70,6 +75,8 @@ class DailyWorkController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
             'due_date' => 'required|date',
+            'course_id' => 'required|exists:courses,id',
+            'cycle' => 'required|string',
             'file' => 'nullable|file|mimes:pdf,txt,doc,docx|max:2048',
         ]);
 
@@ -77,6 +84,8 @@ class DailyWorkController extends Controller
         $dailyWork->name = $request->input('name');
         $dailyWork->description = $request->input('description');
         $dailyWork->due_date = $request->input('due_date');
+        $dailyWork->course_id = $request->input('course_id');
+        $dailyWork->cycle = $request->input('cycle');
 
         // Manejar la subida de archivos
         if ($request->hasFile('file')) {
