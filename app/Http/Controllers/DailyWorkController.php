@@ -18,20 +18,28 @@ class DailyWorkController extends Controller
 
     public function index(Request $request)
     {
-        $search = $request->input('search');
-        $user = Auth::user(); // Obtener el usuario autenticado
+    $search = $request->input('search');
+    $course = $request->input('course');
+    $cycle = $request->input('cycle');
+    $user = Auth::user(); // Obtener el usuario autenticado
 
-        $dailyWorks = $user->dailyWorks()
-            ->when($search, function ($query, $search) {
-                return $query->where('name', 'like', "%{$search}%")
-                             ->orWhere('description', 'like', "%{$search}%")
-                             ->orWhere('due_date', 'like', "%{$search}%");
-            })
-            ->paginate(5); // Paginación con 5 registros por página
+    $dailyWorks = $user->dailyWorks()
+        ->when($search, function ($query, $search) {
+            return $query->where('name', 'like', "%{$search}%")
+                         ->orWhere('description', 'like', "%{$search}%")
+                         ->orWhere('due_date', 'like', "%{$search}%");
+        })
+        ->when($course, function ($query, $course) {
+            return $query->where('course_id', $course);
+        })
+        ->when($cycle, function ($query, $cycle) {
+            return $query->where('cycle', $cycle);
+        })
+        ->paginate(5); // Paginación con 5 registros por página
 
-        $courses = Course::all(); // Obtener todos los cursos
+    $courses = Course::all(); // Obtener todos los cursos
 
-        return view('trabajocotidiano', compact('dailyWorks', 'user', 'courses'));
+    return view('trabajocotidiano', compact('dailyWorks', 'user', 'courses'));
     }
 
     public function store(Request $request) {

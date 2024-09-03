@@ -11,4 +11,9 @@ class DailyWork extends Model
     use HasFactory;
 
     protected $fillable = ['name', 'description', 'due_date'];
+
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
+    }
 }

@@ -11,17 +11,30 @@
         <h1>
             <i class="fas fa-briefcase"></i> Trabajo Cotidiano
             <div class="d-inline-block ml-3">
-                <select id="courseSelect" class="form-control d-inline-block" style="width: 300px;" onchange="updateCycleOptions()">
-                    <option value="">Seleccione un curso</option>
-                    @foreach($courses as $course)
-                        <option value="{{ $course->id }}" data-cycles="{{ $course->cycle }}">
-                            {{ $course->name }} - {{ $course->grade }} - {{ $course->institution }} - {{ $course->classroom }}
-                        </option>
-                    @endforeach
-                </select>
-                <select id="cycleSelect" class="form-control d-inline-block ml-2" style="width: 150px;" onchange="filterByCycle()">
-                    <option value="">Seleccione un ciclo</option>
-                </select>
+                <form id="filterForm" action="{{ route('dailyWorks.index') }}" method="GET" class="d-inline-block">
+                    <select id="courseSelect" name="course" class="form-control d-inline-block" style="width: 300px;" onchange="this.form.submit(); updateCycleOptions();">
+                        <option value="">Seleccione un curso</option>
+                        @foreach($courses as $course)
+                            <option value="{{ $course->id }}" data-cycles="{{ $course->cycle }}" {{ request('course') == $course->id ? 'selected' : '' }}>
+                                {{ $course->name }} - {{ $course->grade }} - {{ $course->institution }} - {{ $course->classroom }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <select id="cycleSelect" name="cycle" class="form-control d-inline-block ml-2" style="width: 150px;" onchange="this.form.submit();">
+                        <option value="">Seleccione un ciclo</option>
+                        @if(request('course'))
+                            @php
+                                $selectedCourse = $courses->firstWhere('id', request('course'));
+                                $cycles = $selectedCourse ? explode(',', $selectedCourse->cycle) : [];
+                            @endphp
+                            @foreach($cycles as $cycle)
+                                <option value="{{ $cycle }}" {{ request('cycle') == $cycle ? 'selected' : '' }}>
+                                    {{ $cycle }}
+                                </option>
+                            @endforeach
+                        @endif
+                    </select>
+                </form>
             </div>
         </h1>
         <p>Selecciona alguna palabra clave para poner en la barra de búsqueda y presiona Enter</p>
@@ -47,7 +60,7 @@
                 <button type="button" class="close" onclick="closeAddDailyWorkModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <form action="{{ route('dailyWorks.store') }}" method="POST" enctype="multipart/form-data">
+                <form id="addDailyWorkForm" action="{{ route('dailyWorks.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="form-group">
                         <label for="name">Nombre</label>
@@ -65,7 +78,7 @@
                         <label for="course">Curso</label>
                         <select id="add-course" name="course_id" class="form-control" onchange="updateAddCycleOptions()" required>
                             <option value="">Seleccione un curso</option>
-                            @foreach($courses as $course)
+                            @foreach ($courses as $course)
                                 <option value="{{ $course->id }}" data-cycles="{{ $course->cycle }}">
                                     {{ $course->name }} - {{ $course->grade }} - {{ $course->institution }} - {{ $course->classroom }}
                                 </option>
@@ -76,7 +89,6 @@
                         <label for="cycle">Ciclo</label>
                         <select id="add-cycle" name="cycle" class="form-control" required>
                             <option value="">Seleccione un ciclo</option>
-                            <option value="Todos">Todos</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -91,78 +103,80 @@
 </div>
 
         <!-- Modal para visualizar trabajo cotidiano -->
-<div id="viewDailyWorkModal" class="modal" style="display: none;">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Visualizar Trabajo Cotidiano</h5>
-                <button type="button" class="close" onclick="closeViewDailyWorkModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p><strong>Nombre:</strong> <span id="viewName"></span></p>
-                <p><strong>Descripción:</strong> <span id="viewDescription"></span></p>
-                <p><strong>Fecha de Entrega:</strong> <span id="viewDueDate"></span></p>
-                <p><strong>Ciclo:</strong> <span id="viewCycle"></span></p> <!-- Nuevo campo -->
+        <div id="viewDailyWorkModal" class="modal" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Visualizar Trabajo Cotidiano</h5>
+                        <button type="button" class="close" onclick="closeViewDailyWorkModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Nombre:</strong> <span id="viewName"></span></p>
+                        <p><strong>Descripción:</strong> <span id="viewDescription"></span></p>
+                        <p><strong>Fecha de Entrega:</strong> <span id="viewDueDate"></span></p>
+                        <p><strong>Curso:</strong> <span id="viewCourse"></span></p> <!-- Mostrar el nombre del curso -->
+                        <p><strong>Ciclo:</strong> <span id="viewCycle"></span></p>
+                        <p><strong>Institución:</strong> <span id="viewInstitution"></span></p> <!-- Mostrar la institución -->
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Modal para editar trabajo cotidiano -->
-<div id="editDailyWorkModal" class="modal" style="display: none;">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Editar Trabajo Cotidiano</h5>
-                <button type="button" class="close" onclick="closeEditDailyWorkModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="editDailyWorkForm" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
-                    <div class="form-group">
-                        <label for="name">Nombre</label>
-                        <input type="text" class="form-control" id="edit-name" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="description">Descripción</label>
-                        <textarea class="form-control" id="edit-description" name="description" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="due_date">Fecha de Entrega</label>
-                        <input type="date" class="form-control" id="edit-due_date" name="due_date" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="course">Curso</label>
-                        <select id="edit-course" name="course_id" class="form-control" required onchange="updateEditCycleOptions()">
-                            <option value="">Seleccione un curso</option>
-                            @foreach($courses as $course)
-                                <option value="{{ $course->id }}" data-cycles="{{ $course->cycle }}">
-                                    {{ $course->name }} - {{ $course->grade }} - {{ $course->institution }} - {{ $course->classroom }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="cycle">Ciclo</label>
-                        <select id="edit-cycle" name="cycle" class="form-control" required>
-                            <option value="">Seleccione un ciclo</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="file">Archivo</label>
-                        <input type="file" class="form-control" id="edit-file" name="file" accept=".pdf,.txt,.doc,.docx">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Actualizar</button>
-                </form>
+    <!-- Modal para editar trabajo cotidiano -->
+    <div id="editDailyWorkModal" class="modal" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Trabajo Cotidiano</h5>
+                    <button type="button" class="close" onclick="closeEditDailyWorkModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="editDailyWorkForm" action="" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+                        <div class="form-group">
+                            <label for="edit-name">Nombre</label>
+                            <input type="text" class="form-control" id="edit-name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-description">Descripción</label>
+                            <textarea class="form-control" id="edit-description" name="description" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-due_date">Fecha de Entrega</label>
+                            <input type="date" class="form-control" id="edit-due_date" name="due_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-course">Curso</label>
+                            <select id="edit-course" name="course_id" class="form-control" onchange="updateEditCycleOptions()" required>
+                                <option value="">Seleccione un curso</option>
+                                @foreach ($courses as $course)
+                                    <option value="{{ $course->id }}" data-cycles="{{ $course->cycle }}">
+                                        {{ $course->name }} - {{ $course->grade }} - {{ $course->institution }} - {{ $course->classroom }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-cycle">Ciclo</label>
+                            <select id="edit-cycle" name="cycle" class="form-control" required>
+                                <option value="">Seleccione un ciclo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-file">Archivo</label>
+                            <input type="file" class="form-control" id="edit-file" name="file" accept=".pdf,.txt,.doc,.docx">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 <!-- Lista de trabajos cotidianos -->
 <div class="container">
-
+    <h1>Lista de Trabajos Cotidianos</h1>
     @if(session('success'))
         <div class="alert alert-success" id="success-message">
             {{ session('success') }}
@@ -173,7 +187,7 @@
         <thead>
             <tr>
                 <th>Nombre del Trabajo</th>
-                <th>Descripción</th>
+                <th>Curso</th>
                 <th>Fecha de Entrega</th>
                 <th>Ciclo</th>
                 <th>Archivo</th>
@@ -184,7 +198,7 @@
             @forelse($dailyWorks as $dailyWork)
                 <tr>
                     <td>{{ $dailyWork->name }}</td>
-                    <td>{{ $dailyWork->description }}</td>
+                    <td>{{ $dailyWork->course->name }}</td>
                     <td>{{ $dailyWork->due_date }}</td>
                     <td>{{ $dailyWork->cycle }}</td>
                     <td>
@@ -232,6 +246,7 @@
 <script>
     function openAddDailyWorkModal() {
         document.getElementById('addDailyWorkModal').style.display = 'block';
+        updateAddCycleOptions(); // Actualizar las opciones de ciclo cuando se abre el modal
     }
 
     function closeAddDailyWorkModal() {
@@ -242,7 +257,9 @@
         document.getElementById('viewName').innerText = dailyWork.name;
         document.getElementById('viewDescription').innerText = dailyWork.description;
         document.getElementById('viewDueDate').innerText = dailyWork.due_date;
+        document.getElementById('viewCourse').innerText = dailyWork.course.name; // Mostrar el nombre del curso
         document.getElementById('viewCycle').innerText = dailyWork.cycle; // Mostrar ciclo
+        document.getElementById('viewInstitution').innerText = dailyWork.course.institution; // Mostrar institución
         document.getElementById('viewDailyWorkModal').style.display = 'block';
     }
 
@@ -259,6 +276,10 @@
         document.getElementById('edit-description').value = dailyWork.description;
         document.getElementById('edit-due_date').value = dailyWork.due_date;
 
+        // Precargar el curso y ciclo
+        document.getElementById('edit-course').value = dailyWork.course_id;
+        updateEditCycleOptions(dailyWork.course_id, dailyWork.cycle);
+
         // Limpiar el campo de archivo
         document.getElementById('edit-file').value = '';
 
@@ -268,229 +289,261 @@
     function closeEditDailyWorkModal() {
         document.getElementById('editDailyWorkModal').style.display = 'none';
     }
-//ciclo opciones filtrar
+
+    // Función para actualizar las opciones de ciclo en el dropdown de filtros
     function updateCycleOptions() {
-    var courseSelect = document.getElementById('courseSelect');
-    var cycleSelect = document.getElementById('cycleSelect');
-    var selectedCourse = courseSelect.options[courseSelect.selectedIndex];
-    var cycles = selectedCourse.getAttribute('data-cycles');
+        var courseSelect = document.getElementById('courseSelect');
+        var cycleSelect = document.getElementById('cycleSelect');
+        var selectedCourse = courseSelect.options[courseSelect.selectedIndex];
+        var cycles = selectedCourse.getAttribute('data-cycles');
 
-    // Limpiar las opciones del ciclo
-    cycleSelect.innerHTML = '<option value="">Seleccione un ciclo</option>';
+        // Limpiar las opciones del ciclo
+        cycleSelect.innerHTML = '<option value="">Seleccione un ciclo</option>';
+        cycleSelect.innerHTML += '<option value="todos">Todos</option>'; // Agregar opción "Todos"
 
-    // Añadir la opción "Todos"
-    var optionTodos = document.createElement('option');
-    optionTodos.value = 'Todos';
-    optionTodos.text = 'Todos';
-    cycleSelect.appendChild(optionTodos);
+        if (cycles) {
+            var cycleOptions = cycles.split(',');
+            cycleOptions.forEach(function(cycle) {
+                if (cycle.toLowerCase() === 'semestre') {
+                    var option1 = document.createElement('option');
+                    option1.value = 'Primer Semestre';
+                    option1.text = 'Primer Semestre';
+                    cycleSelect.appendChild(option1);
 
-    if (cycles) {
-        var cycleOptions = cycles.split(',');
-        cycleOptions.forEach(function(cycle) {
-            if (cycle.toLowerCase() === 'semestre') {
-                var option1 = document.createElement('option');
-                option1.value = 'Primer Semestre';
-                option1.text = 'Primer Semestre';
-                cycleSelect.appendChild(option1);
+                    var option2 = document.createElement('option');
+                    option2.value = 'Segundo Semestre';
+                    option2.text = 'Segundo Semestre';
+                    cycleSelect.appendChild(option2);
+                } else if (cycle.toLowerCase() === 'trimestre') {
+                    var option1 = document.createElement('option');
+                    option1.value = 'Primer Trimestre';
+                    option1.text = 'Primer Trimestre';
+                    cycleSelect.appendChild(option1);
 
-                var option2 = document.createElement('option');
-                option2.value = 'Segundo Semestre';
-                option2.text = 'Segundo Semestre';
-                cycleSelect.appendChild(option2);
-            } else if (cycle.toLowerCase() === 'trimestre') {
-                var option1 = document.createElement('option');
-                option1.value = 'Primer Trimestre';
-                option1.text = 'Primer Trimestre';
-                cycleSelect.appendChild(option1);
+                    var option2 = document.createElement('option');
+                    option2.value = 'Segundo Trimestre';
+                    option2.text = 'Segundo Trimestre';
+                    cycleSelect.appendChild(option2);
 
-                var option2 = document.createElement('option');
-                option2.value = 'Segundo Trimestre';
-                option2.text = 'Segundo Trimestre';
-                cycleSelect.appendChild(option2);
+                    var option3 = document.createElement('option');
+                    option3.value = 'Tercer Trimestre';
+                    option3.text = 'Tercer Trimestre';
+                    cycleSelect.appendChild(option3);
+                } else if (cycle.toLowerCase() === 'cuatrimestre') {
+                    var option1 = document.createElement('option');
+                    option1.value = 'Primer Cuatrimestre';
+                    option1.text = 'Primer Cuatrimestre';
+                    cycleSelect.appendChild(option1);
 
-                var option3 = document.createElement('option');
-                option3.value = 'Tercer Trimestre';
-                option3.text = 'Tercer Trimestre';
-                cycleSelect.appendChild(option3);
-            } else if (cycle.toLowerCase() === 'cuatrimestre') {
-                var option1 = document.createElement('option');
-                option1.value = 'Primer Cuatrimestre';
-                option1.text = 'Primer Cuatrimestre';
-                cycleSelect.appendChild(option1);
+                    var option2 = document.createElement('option');
+                    option2.value = 'Segundo Cuatrimestre';
+                    option2.text = 'Segundo Cuatrimestre';
+                    cycleSelect.appendChild(option2);
 
-                var option2 = document.createElement('option');
-                option2.value = 'Segundo Cuatrimestre';
-                option2.text = 'Segundo Cuatrimestre';
-                cycleSelect.appendChild(option2);
+                    var option3 = document.createElement('option');
+                    option3.value = 'Tercer Cuatrimestre';
+                    option3.text = 'Tercer Cuatrimestre';
+                    cycleSelect.appendChild(option3);
 
-                var option3 = document.createElement('option');
-                option3.value = 'Tercer Cuatrimestre';
-                option3.text = 'Tercer Cuatrimestre';
-                cycleSelect.appendChild(option3);
-
-                var option4 = document.createElement('option');
-                option4.value = 'Cuarto Cuatrimestre';
-                option4.text = 'Cuarto Cuatrimestre';
-                cycleSelect.appendChild(option4);
-            } else {
-                var option = document.createElement('option');
-                option.value = cycle;
-                option.text = cycle;
-                cycleSelect.appendChild(option);
-            }
-        });
+                    var option4 = document.createElement('option');
+                    option4.value = 'Cuarto Cuatrimestre';
+                    option4.text = 'Cuarto Cuatrimestre';
+                    cycleSelect.appendChild(option4);
+                } else {
+                    var option = document.createElement('option');
+                    option.value = cycle;
+                    option.text = cycle;
+                    cycleSelect.appendChild(option);
+                }
+            });
+        }
     }
 
-}
-// Función para actualizar las opciones de ciclo en el modal de agregar
-function updateAddCycleOptions() {
-    var courseSelect = document.getElementById('add-course');
-    var cycleSelect = document.getElementById('add-cycle');
-    var selectedCourse = courseSelect.options[courseSelect.selectedIndex];
-    var cycles = selectedCourse.getAttribute('data-cycles');
+    // Función para actualizar las opciones de ciclo en el modal de agregar
+    function updateAddCycleOptions() {
+        var courseSelect = document.getElementById('add-course');
+        var cycleSelect = document.getElementById('add-cycle');
+        var selectedCourse = courseSelect.options[courseSelect.selectedIndex];
+        var cycles = selectedCourse.getAttribute('data-cycles');
 
-    // Limpiar las opciones del ciclo
-    cycleSelect.innerHTML = '<option value="">Seleccione un ciclo</option>';
+        // Limpiar las opciones del ciclo
+        cycleSelect.innerHTML = '<option value="">Seleccione un ciclo</option>';
 
-    if (cycles) {
-        var cycleOptions = cycles.split(',');
-        cycleOptions.forEach(function(cycle) {
-            if (cycle.toLowerCase() === 'semestre') {
-                var option1 = document.createElement('option');
-                option1.value = 'Primer Semestre';
-                option1.text = 'Primer Semestre';
-                cycleSelect.appendChild(option1);
+        if (cycles) {
+            var cycleOptions = cycles.split(',');
+            cycleOptions.forEach(function(cycle) {
+                if (cycle.toLowerCase() === 'semestre') {
+                    var option1 = document.createElement('option');
+                    option1.value = 'Primer Semestre';
+                    option1.text = 'Primer Semestre';
+                    cycleSelect.appendChild(option1);
 
-                var option2 = document.createElement('option');
-                option2.value = 'Segundo Semestre';
-                option2.text = 'Segundo Semestre';
-                cycleSelect.appendChild(option2);
-            } else if (cycle.toLowerCase() === 'trimestre') {
-                var option1 = document.createElement('option');
-                option1.value = 'Primer Trimestre';
-                option1.text = 'Primer Trimestre';
-                cycleSelect.appendChild(option1);
+                    var option2 = document.createElement('option');
+                    option2.value = 'Segundo Semestre';
+                    option2.text = 'Segundo Semestre';
+                    cycleSelect.appendChild(option2);
+                } else if (cycle.toLowerCase() === 'trimestre') {
+                    var option1 = document.createElement('option');
+                    option1.value = 'Primer Trimestre';
+                    option1.text = 'Primer Trimestre';
+                    cycleSelect.appendChild(option1);
 
-                var option2 = document.createElement('option');
-                option2.value = 'Segundo Trimestre';
-                option2.text = 'Segundo Trimestre';
-                cycleSelect.appendChild(option2);
+                    var option2 = document.createElement('option');
+                    option2.value = 'Segundo Trimestre';
+                    option2.text = 'Segundo Trimestre';
+                    cycleSelect.appendChild(option2);
 
-                var option3 = document.createElement('option');
-                option3.value = 'Tercer Trimestre';
-                option3.text = 'Tercer Trimestre';
-                cycleSelect.appendChild(option3);
-            } else if (cycle.toLowerCase() === 'cuatrimestre') {
-                var option1 = document.createElement('option');
-                option1.value = 'Primer Cuatrimestre';
-                option1.text = 'Primer Cuatrimestre';
-                cycleSelect.appendChild(option1);
+                    var option3 = document.createElement('option');
+                    option3.value = 'Tercer Trimestre';
+                    option3.text = 'Tercer Trimestre';
+                    cycleSelect.appendChild(option3);
+                } else if (cycle.toLowerCase() === 'cuatrimestre') {
+                    var option1 = document.createElement('option');
+                    option1.value = 'Primer Cuatrimestre';
+                    option1.text = 'Primer Cuatrimestre';
+                    cycleSelect.appendChild(option1);
 
-                var option2 = document.createElement('option');
-                option2.value = 'Segundo Cuatrimestre';
-                option2.text = 'Segundo Cuatrimestre';
-                cycleSelect.appendChild(option2);
+                    var option2 = document.createElement('option');
+                    option2.value = 'Segundo Cuatrimestre';
+                    option2.text = 'Segundo Cuatrimestre';
+                    cycleSelect.appendChild(option2);
 
-                var option3 = document.createElement('option');
-                option3.value = 'Tercer Cuatrimestre';
-                option3.text = 'Tercer Cuatrimestre';
-                cycleSelect.appendChild(option3);
+                    var option3 = document.createElement('option');
+                    option3.value = 'Tercer Cuatrimestre';
+                    option3.text = 'Tercer Cuatrimestre';
+                    cycleSelect.appendChild(option3);
 
-                var option4 = document.createElement('option');
-                option4.value = 'Cuarto Cuatrimestre';
-                option4.text = 'Cuarto Cuatrimestre';
-                cycleSelect.appendChild(option4);
-            } else {
-                var option = document.createElement('option');
-                option.value = cycle;
-                option.text = cycle;
-                cycleSelect.appendChild(option);
-            }
-        });
+                    var option4 = document.createElement('option');
+                    option4.value = 'Cuarto Cuatrimestre';
+                    option4.text = 'Cuarto Cuatrimestre';
+                    cycleSelect.appendChild(option4);
+                } else {
+                    var option = document.createElement('option');
+                    option.value = cycle;
+                    option.text = cycle;
+                    cycleSelect.appendChild(option);
+                }
+            });
+        }
     }
-}
 
-// Función para actualizar las opciones de ciclo en el modal de editar
-function updateEditCycleOptions() {
-    var courseSelect = document.getElementById('edit-course');
-    var cycleSelect = document.getElementById('edit-cycle');
-    var selectedCourse = courseSelect.options[courseSelect.selectedIndex];
-    var cycles = selectedCourse.getAttribute('data-cycles');
+    // Función para actualizar las opciones de ciclo en el modal de editar
+    function updateEditCycleOptions(courseId, selectedCycle) {
+        var courseSelect = document.getElementById('edit-course');
+        var cycleSelect = document.getElementById('edit-cycle');
+        var selectedCourse = courseSelect.querySelector(`option[value="${courseId}"]`);
+        var cycles = selectedCourse.getAttribute('data-cycles');
 
-    // Limpiar las opciones del ciclo
-    cycleSelect.innerHTML = '<option value="">Seleccione un ciclo</option>';
+        // Limpiar las opciones del ciclo
+        cycleSelect.innerHTML = '<option value="">Seleccione un ciclo</option>';
 
-    if (cycles) {
-        var cycleOptions = cycles.split(',');
-        cycleOptions.forEach(function(cycle) {
-            if (cycle.toLowerCase() === 'semestre') {
-                var option1 = document.createElement('option');
-                option1.value = 'Primer Semestre';
-                option1.text = 'Primer Semestre';
-                cycleSelect.appendChild(option1);
+        if (cycles) {
+            var cycleOptions = cycles.split(',');
+            cycleOptions.forEach(function(cycle) {
+                if (cycle.toLowerCase() === 'semestre') {
+                    var option1 = document.createElement('option');
+                    option1.value = 'Primer Semestre';
+                    option1.text = 'Primer Semestre';
+                    if (selectedCycle === 'Primer Semestre') {
+                        option1.selected = true;
+                    }
+                    cycleSelect.appendChild(option1);
 
-                var option2 = document.createElement('option');
-                option2.value = 'Segundo Semestre';
-                option2.text = 'Segundo Semestre';
-                cycleSelect.appendChild(option2);
-            } else if (cycle.toLowerCase() === 'trimestre') {
-                var option1 = document.createElement('option');
-                option1.value = 'Primer Trimestre';
-                option1.text = 'Primer Trimestre';
-                cycleSelect.appendChild(option1);
+                    var option2 = document.createElement('option');
+                    option2.value = 'Segundo Semestre';
+                    option2.text = 'Segundo Semestre';
+                    if (selectedCycle === 'Segundo Semestre') {
+                        option2.selected = true;
+                    }
+                    cycleSelect.appendChild(option2);
+                } else if (cycle.toLowerCase() === 'trimestre') {
+                    var option1 = document.createElement('option');
+                    option1.value = 'Primer Trimestre';
+                    option1.text = 'Primer Trimestre';
+                    if (selectedCycle === 'Primer Trimestre') {
+                        option1.selected = true;
+                    }
+                    cycleSelect.appendChild(option1);
 
-                var option2 = document.createElement('option');
-                option2.value = 'Segundo Trimestre';
-                option2.text = 'Segundo Trimestre';
-                cycleSelect.appendChild(option2);
+                    var option2 = document.createElement('option');
+                    option2.value = 'Segundo Trimestre';
+                    option2.text = 'Segundo Trimestre';
+                    if (selectedCycle === 'Segundo Trimestre') {
+                        option2.selected = true;
+                    }
+                    cycleSelect.appendChild(option2);
 
-                var option3 = document.createElement('option');
-                option3.value = 'Tercer Trimestre';
-                option3.text = 'Tercer Trimestre';
-                cycleSelect.appendChild(option3);
-            } else if (cycle.toLowerCase() === 'cuatrimestre') {
-                var option1 = document.createElement('option');
-                option1.value = 'Primer Cuatrimestre';
-                option1.text = 'Primer Cuatrimestre';
-                cycleSelect.appendChild(option1);
+                    var option3 = document.createElement('option');
+                    option3.value = 'Tercer Trimestre';
+                    option3.text = 'Tercer Trimestre';
+                    if (selectedCycle === 'Tercer Trimestre') {
+                        option3.selected = true;
+                    }
+                    cycleSelect.appendChild(option3);
+                } else if (cycle.toLowerCase() === 'cuatrimestre') {
+                    var option1 = document.createElement('option');
+                    option1.value = 'Primer Cuatrimestre';
+                    option1.text = 'Primer Cuatrimestre';
+                    if (selectedCycle === 'Primer Cuatrimestre') {
+                        option1.selected = true;
+                    }
+                    cycleSelect.appendChild(option1);
 
-                var option2 = document.createElement('option');
-                option2.value = 'Segundo Cuatrimestre';
-                option2.text = 'Segundo Cuatrimestre';
-                cycleSelect.appendChild(option2);
+                    var option2 = document.createElement('option');
+                    option2.value = 'Segundo Cuatrimestre';
+                    option2.text = 'Segundo Cuatrimestre';
+                    if (selectedCycle === 'Segundo Cuatrimestre') {
+                        option2.selected = true;
+                    }
+                    cycleSelect.appendChild(option2);
 
-                var option3 = document.createElement('option');
-                option3.value = 'Tercer Cuatrimestre';
-                option3.text = 'Tercer Cuatrimestre';
-                cycleSelect.appendChild(option3);
+                    var option3 = document.createElement('option');
+                    option3.value = 'Tercer Cuatrimestre';
+                    option3.text = 'Tercer Cuatrimestre';
+                    if (selectedCycle === 'Tercer Cuatrimestre') {
+                        option3.selected = true;
+                    }
+                    cycleSelect.appendChild(option3);
 
-                var option4 = document.createElement('option');
-                option4.value = 'Cuarto Cuatrimestre';
-                option4.text = 'Cuarto Cuatrimestre';
-                cycleSelect.appendChild(option4);
-            } else {
-                var option = document.createElement('option');
-                option.value = cycle;
-                option.text = cycle;
-                cycleSelect.appendChild(option);
-            }
-        });
+                    var option4 = document.createElement('option');
+                    option4.value = 'Cuarto Cuatrimestre';
+                    option4.text = 'Cuarto Cuatrimestre';
+                    if (selectedCycle === 'Cuarto Cuatrimestre') {
+                        option4.selected = true;
+                    }
+                    cycleSelect.appendChild(option4);
+                } else {
+                    var option = document.createElement('option');
+                    option.value = cycle;
+                    option.text = cycle;
+                    if (cycle === selectedCycle) {
+                        option.selected = true;
+                    }
+                    cycleSelect.appendChild(option);
+                }
+            });
+        }
     }
-}
 
-function filterByCycle() {
-    var cycleSelect = document.getElementById('cycleSelect');
-    var selectedCycle = cycleSelect.value;
+    // Enviar formulario automáticamente al cambiar el curso o ciclo
+    document.getElementById('courseSelect').addEventListener('change', function() {
+        updateCycleOptions();
+        document.getElementById('filterForm').submit();
+    });
 
-    var rows = document.querySelectorAll('table tbody tr');
-    rows.forEach(function(row) {
-        var cycleCell = row.querySelector('td:nth-child(4)'); // Asumiendo que la columna de ciclo es la cuarta
-        if (selectedCycle === 'Todos' || cycleCell.innerText === selectedCycle) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
+    document.getElementById('cycleSelect').addEventListener('change', function() {
+        var cycleSelect = document.getElementById('cycleSelect');
+        if (cycleSelect.value === 'todos') {
+            cycleSelect.value = ''; // Resetear el valor para mostrar todos los registros
+        }
+        document.getElementById('filterForm').submit();
+    });
+
+    // Inicializar las opciones de ciclo si ya hay un curso seleccionado
+    document.addEventListener('DOMContentLoaded', function() {
+        if (document.getElementById('courseSelect').value) {
+            updateCycleOptions();
         }
     });
-}
 </script>
 @endsection
