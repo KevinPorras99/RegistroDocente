@@ -11,6 +11,13 @@
         <h1><i class="fas fa-book"></i> Cursos</h1>
         <p>Selecciona alguna palabra clave para poner en la barra de búsqueda y presiona Enter</p>
 
+        <!-- Mostrar mensaje de éxito -->
+        @if(session('success'))
+            <div id="success-message" class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
         <!-- Barra de búsqueda y botón para agregar curso -->
         <div class="d-flex flex-wrap mb-3">
             <form action="{{ route('courses.index') }}" method="GET" class="mr-2 flex-grow-1 d-flex">
@@ -127,63 +134,90 @@
             </div>
         </div>
 
+       <!-- Modal para asignar estudiantes -->
+        <div id="assignStudentsModal" class="modal" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Asignar Estudiantes</h5>
+                        <button type="button" class="close" onclick="closeAssignStudentsModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="assignStudentsForm" action="{{ route('courses.assignStudents') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="course_id" id="course_id" value="">
+
+                            @foreach($students as $student)
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="student_{{ $student->id }}" name="student_ids[]"
+                                        value="{{ $student->id }}">
+                                    <label class="form-check-label" for="student_{{ $student->id }}">
+                                        {{ $student->name }}, {{ $student->institution }}, {{ $student->section }}
+                                    </label>
+                                </div>
+                            @endforeach
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="submitAssignStudentsForm()">Asignar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Lista de cursos -->
         <div class="container">
             <h1>Lista de Cursos</h1>
-            @if(session('success'))
-                <div class="alert alert-success" id="success-message">
-                    {{ session('success') }}
-                </div>
-            @endif
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Grado</th>
+                        <th>Institución</th>
+                        <th>Grupo</th>
+                        <th>Ciclo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($courses as $course)
                         <tr>
-                            <th>Nombre del Curso</th>
-                            <th>Grado</th>
-                            <th>Institución</th>
-                            <th>Grupo</th>
-                            <th>Ciclo</th>
-                            <th>Acciones</th>
+                            <td>{{ $course->name }}</td>
+                            <td>{{ $course->grade }}</td>
+                            <td>{{ $course->institution }}</td>
+                            <td>{{ $course->classroom }}</td>
+                            <td>{{ $course->cycle }}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary" onclick="openAssignStudentsModal({{ $course->id }}, {{ json_encode($course->students->pluck('id')->toArray()) }})">
+                                    Asignar Estudiantes
+                                </button>
+
+                                <button class="btn btn-sm" style="background-color: transparent;" onclick="openViewCourseModal({{ json_encode($course) }})">
+                                    <i class="fas fa-eye" style="color: rgb(80, 125, 252); font-size: 1rem;"></i>
+                                </button>
+                                <button class="btn btn-sm" style="background-color: transparent;" onclick="openEditCourseModal({{ json_encode($course) }})">
+                                    <i class="fas fa-pencil-alt" style="color: green; font-size: 1rem;"></i>
+                                </button>
+                                <form action="{{ route('courses.destroy', $course->id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm" style="background-color: transparent;" onclick="return confirm('¿Estás seguro de que deseas eliminar este curso?');">
+                                        <i class="fas fa-trash" style="color: red; font-size: 1rem;"></i>
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($courses as $course)
-                            <tr>
-                                <td>{{ $course->name }}</td>
-                                <td>{{ $course->grade }}</td>
-                                <td>{{ $course->institution }}</td>
-                                <td>{{ $course->classroom }}</td>
-                                <td>{{ $course->cycle }}</td>
-                                <td>
-                                    <button class="btn btn-sm" style="background-color: transparent;" onclick="openViewCourseModal({{ json_encode($course) }})">
-                                        <i class="fas fa-eye" style="color: rgb(80, 125, 252); font-size: 1rem;"></i>
-                                    </button>
-                                    <button class="btn btn-sm" style="background-color: transparent;" onclick="openEditCourseModal({{ json_encode($course) }})">
-                                        <i class="fas fa-pencil-alt" style="color: green; font-size: 1rem;"></i>
-                                    </button>
-                                    <form action="{{ route('courses.destroy', $course->id) }}" method="POST" style="display:inline;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm" style="background-color: transparent;" onclick="return confirm('¿Estás seguro de que deseas eliminar este curso?');">
-                                            <i class="fas fa-trash" style="color: red; font-size: 1rem;"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="text-center">No hay cursos registrados.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="6">No hay cursos disponibles.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-            <!-- Enlaces de paginación -->
-            <div class="d-flex justify-content-center">
-                {{ $courses->links('pagination::bootstrap-4') }}
-            </div>
+        <!-- Enlaces de paginación -->
+        <div class="d-flex justify-content-center">
+            {{ $courses->links('pagination::bootstrap-4') }}
         </div>
     </div>
 @endsection
@@ -207,6 +241,20 @@
             document.getElementById('viewInstitution').innerText = course.institution;
             document.getElementById('viewClassroom').innerText = course.classroom;
             document.getElementById('viewCycle').innerText = course.cycle;
+
+            // Fetch and display assigned students
+            fetch(`/courses/${course.id}/students`)
+                .then(response => response.json())
+                .then(data => {
+                    const studentsList = document.getElementById('viewStudents');
+                    studentsList.innerHTML = '';
+                    data.forEach(student => {
+                        const li = document.createElement('li');
+                        li.textContent = `${student.name} - ${student.institution} - ${student.section}`;
+                        studentsList.appendChild(li);
+                    });
+                });
+
             document.getElementById('viewCourseModal').style.display = 'block';
         }
 
@@ -239,5 +287,26 @@
                 successMessage.style.display = 'none';
             }
         }, 3000);
+
+        function openAssignStudentsModal(courseId, assignedStudents) {
+            document.getElementById('course_id').value = courseId;
+
+            // Marcar los checkboxes como seleccionados si los estudiantes ya están asignados
+            const studentCheckboxes = document.querySelectorAll('#assignStudentsModal .form-check-input');
+            studentCheckboxes.forEach(checkbox => {
+                checkbox.checked = assignedStudents.includes(parseInt(checkbox.value));
+            });
+
+            // Abrir el modal
+            document.getElementById('assignStudentsModal').style.display = 'block';
+        }
+
+        function closeAssignStudentsModal() {
+            document.getElementById('assignStudentsModal').style.display = 'none';
+        }
+
+        function submitAssignStudentsForm() {
+            document.getElementById('assignStudentsForm').submit();
+        }
     </script>
 @endsection

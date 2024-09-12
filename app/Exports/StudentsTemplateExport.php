@@ -10,7 +10,7 @@ class StudentsTemplateExport implements FromArray, WithHeadings
     public function headings(): array
     {
         return [
-            'Nombre', 'Grado', 'Institución', 'Sección', 'Ejemplo de Sección 10--2'
+            'Nombre', 'Grado', 'Institución', 'Grupo'
         ];
     }
 

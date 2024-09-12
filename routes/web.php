@@ -19,8 +19,11 @@ Route::get('/', function () {
 Route::resource('students', StudentController::class)->middleware('auth');
 Route::get('/estudiantes', [StudentController::class, 'index'])->name('estudiantes');
 
+
 Route::resource('courses', CourseController::class)->middleware('auth');
 Route::get('/cursos', [CourseController::class, 'index'])->name('cursos');
+Route::post('/cursos/assign-students', [CourseController::class, 'assignStudents'])->name('courses.assignStudents');
+Route::get('/cursos/{courseId}', [CourseController::class, 'show'])->name('courses.show');
 
 Route::resource('tasks', TaskController::class)->middleware('auth');
 Route::get('/tareasyasignaciones', [TaskController::class, 'index'])->name('tareasyasignaciones');

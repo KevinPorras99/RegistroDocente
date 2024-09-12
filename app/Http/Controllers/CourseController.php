@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/CourseController.php
 
 namespace App\Http\Controllers;
 
@@ -7,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Course;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\Student;
 
 class CourseController extends Controller
 {
@@ -15,22 +15,28 @@ class CourseController extends Controller
         $this->middleware('auth');
     }
 
+    
+    
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $user = Auth::user(); // Obtener el usuario autenticado
+        $user = Auth::user();
 
         $courses = $user->courses()
             ->when($search, function ($query, $search) {
-                return $query->where('name', 'like', "%{$search}%")
-                             ->orWhere('grade', 'like', "%{$search}%")
-                             ->orWhere('institution', 'like', "%{$search}%")
-                             ->orWhere('classroom', 'like', "%{$search}%")
-                             ->orWhere('cycle', 'like', "%{$search}%");
+                return $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('grade', 'like', "%{$search}%")
+                    ->orWhere('institution', 'like', "%{$search}%")
+                    ->orWhere('classroom', 'like', "%{$search}%")
+                    ->orWhere('cycle', 'like', "%{$search}%");
+                });
             })
-            ->paginate(5); // Paginación con 5 registros por página
+            ->paginate(5);
 
-        return view('cursos', compact('courses', 'user'));
+        $students = Student::all(); // Obtener todos los estudiantes
+
+        return view('cursos', compact('courses', 'user', 'students'));
     }
 
     public function store(Request $request) {
@@ -93,5 +99,39 @@ class CourseController extends Controller
             $course->delete();
         }
         return redirect()->route('courses.index');
+    }
+
+    public function assignStudents(Request $request)
+    {
+    $courseId = $request->input('course_id');
+    $studentIds = $request->input('student_ids', []);
+
+    $course = Course::find($courseId);
+    $course->students()->sync($studentIds);
+
+    return redirect()->route('courses.index')->with('success', 'Estudiantes asignados correctamente.');
+    }
+
+    public function show($courseId)
+    {
+        $course = Course::find($courseId);
+        $students = Student::all(); // Asumiendo que tienes una lista de todos los estudiantes
+
+        return view('cursos', compact('course', 'students'));
+    }
+
+    public function getAssignedStudents($courseId)
+    {
+        $course = Course::find($courseId);
+        $assignedStudents = $course->students; // Asumiendo que tienes una relación definida en el modelo Course
+
+        return response()->json($assignedStudents);
+    }
+
+    public function removeStudent($courseId, $studentId)
+    {
+        $course = Course::find($courseId);
+        $course->students()->detach($studentId);
+        return response()->json(['success' => true]);
     }
 }
