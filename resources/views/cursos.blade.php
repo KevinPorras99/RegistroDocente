@@ -146,16 +146,20 @@
                         <form id="assignStudentsForm" action="{{ route('courses.assignStudents') }}" method="POST">
                             @csrf
                             <input type="hidden" name="course_id" id="course_id" value="">
-
-                            @foreach($students as $student)
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="student_{{ $student->id }}" name="student_ids[]"
-                                        value="{{ $student->id }}">
-                                    <label class="form-check-label" for="student_{{ $student->id }}">
-                                        {{ $student->name }}, {{ $student->institution }}, {{ $student->section }}
-                                    </label>
-                                </div>
-                            @endforeach
+                
+                            @if($students->isEmpty())
+                                <p>Primero debes de registrar estudiantes en la sección "Estudiantes".</p>
+                            @else
+                                @foreach($students as $student)
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="student_{{ $student->id }}" name="student_ids[]"
+                                            value="{{ $student->id }}">
+                                        <label class="form-check-label" for="student_{{ $student->id }}">
+                                            {{ $student->name }}, {{ $student->institution }}, {{ $student->section }}
+                                        </label>
+                                    </div>
+                                @endforeach
+                            @endif
                         </form>
                     </div>
                     <div class="modal-footer">

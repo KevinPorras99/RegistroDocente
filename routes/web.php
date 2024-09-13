@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\DailyWorkController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\GradeController;
 
 // Vista por defecto redirigida a login
 Route::get('/', function () {
@@ -24,6 +25,9 @@ Route::resource('courses', CourseController::class)->middleware('auth');
 Route::get('/cursos', [CourseController::class, 'index'])->name('cursos');
 Route::post('/cursos/assign-students', [CourseController::class, 'assignStudents'])->name('courses.assignStudents');
 Route::get('/cursos/{courseId}', [CourseController::class, 'show'])->name('courses.show');
+Route::get('/cursos/{id}/detalles', [CourseController::class, 'showDailyTask'])->name('courses.showDailyTask');
+
+Route::get('/cursos/{courseId}/student/{studentId}/courseworks', [DailyWorkController::class, 'getCourseWorks']);
 
 Route::resource('tasks', TaskController::class)->middleware('auth');
 Route::get('/tareasyasignaciones', [TaskController::class, 'index'])->name('tareasyasignaciones');
@@ -50,7 +54,5 @@ Route::delete('/profile/delete', [SessionController::class, 'deleteProfileImage'
 
 Route::get('/estudiantes/download-template', [StudentController::class, 'downloadTemplate'])->name('students.downloadTemplate');
 Route::post('/estudiantes/upload-excel', [StudentController::class, 'uploadExcel'])->name('students.uploadExcel');
-// Página de inicio (home) después de autenticarse
-//Route::get('/home', function () {
-//    return view('home');
-//})->middleware('auth')->name('home');
+
+Route::post('/grades', [GradeController::class, 'store'])->name('grades.store');

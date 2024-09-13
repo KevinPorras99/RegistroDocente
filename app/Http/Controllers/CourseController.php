@@ -134,4 +134,12 @@ class CourseController extends Controller
         $course->students()->detach($studentId);
         return response()->json(['success' => true]);
     }
+
+    public function showDailyTask($id)
+    {
+        $course = Course::with('students')->findOrFail($id);
+        $dailyTasks = $course->dailyTasks; // Asumiendo que tienes una relación dailyTasks en el modelo Course
+
+        return view('cursos.show', compact('course', 'dailyTasks'));
+    }
 }

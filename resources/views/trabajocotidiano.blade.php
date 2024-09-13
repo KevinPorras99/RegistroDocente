@@ -258,6 +258,73 @@
                 {{ $dailyWorks->links('pagination::bootstrap-4') }}
             </div>
         </div>
+
+        <!-- Lista de estudiantes enlazados la curso -->
+        <div class="container mt-5">
+            <h2>Lista de Estudiantes</h2>
+            @if(empty($students))
+                <p>No hay estudiantes enlazados a este curso.</p>
+            @else
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Institución</th>
+                            <th>Sección</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($students as $student)
+                        <tr>
+                            <td>{{ $student->name }}</td>
+                            <td>{{ $student->institution }}</td>
+                            <td>{{ $student->section }}</td>
+                            <td>
+                                <button class="btn btn-primary" onclick="openGradeModal({{ $student->id }}, '{{ $student->name }}', {{ $courseId }}, '{{ $cycle }}')">Añadir Calificación</button>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+        </div>
+
+        <!-- Modal para añadir calificaciones -->
+        <div id="gradeModal" class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Añadir Calificación</h5>
+                        <button type="button" class="close" onclick="closeGradeModal()" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="gradeForm">
+                            <input type="hidden" id="studentId">
+                            <input type="hidden" id="courseId">
+                            <div class="form-group">
+                                <label for="studentName">Nombre del Estudiante</label>
+                                <input type="text" class="form-control" id="studentName" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="courseWorkList">Trabajos Cotidianos</label>
+                                <ul class="list-group" id="courseWorkList">
+                                    <!-- Opciones cargadas dinámicamente -->
+                                </ul>
+                            </div>
+                            <div class="form-group">
+                                <label for="grade">Calificación</label>
+                                <input type="number" class="form-control" id="grade" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     @endsection
 
     @section('scripts')
@@ -565,6 +632,87 @@
                 if (document.getElementById('courseSelect').value) {
                     updateCycleOptions();
                 }
+            });
+
+
+            function openAddDailyWorkModal() {
+                document.getElementById('addDailyWorkModal').style.display = 'block';
+                updateAddCycleOptions(); // Actualizar las opciones de ciclo cuando se abre el modal
+            }
+
+            function closeAddDailyWorkModal() {
+                document.getElementById('addDailyWorkModal').style.display = 'none';
+            }
+
+            function openViewDailyWorkModal(dailyWork) {
+                document.getElementById('viewName').innerText = dailyWork.name;
+                document.getElementById('viewDescription').innerText = dailyWork.description;
+                document.getElementById('viewDueDate').innerText = dailyWork.due_date;
+                document.getElementById('viewCourse').innerText = dailyWork.course.name; // Mostrar el nombre del curso
+                document.getElementById('viewCycle').innerText = dailyWork.cycle; // Mostrar ciclo
+                document.getElementById('viewInstitution').innerText = dailyWork.course.institution; // Mostrar institución
+                document.getElementById('viewDailyWorkModal').style.display = 'block';
+            }
+
+            function openGradeModal(studentId, studentName, courseId, cycle) {
+            document.getElementById('studentName').value = studentName;
+            document.getElementById('studentId').value = studentId;
+            document.getElementById('courseId').value = courseId;
+
+            // Cargar los trabajos cotidianos
+            fetch(`/api/course/${courseId}/student/${studentId}/courseworks?cycle=${cycle}`)
+                .then(response => response.json())
+                .then(data => {
+                    const courseWorkList = document.getElementById('courseWorkList');
+                    courseWorkList.innerHTML = ''; // Limpiar opciones anteriores
+                    data.forEach(courseWork => {
+                        const listItem = document.createElement('li');
+                        listItem.className = 'list-group-item';
+                        listItem.innerHTML = `
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="dailyWorkId" id="dailyWork${courseWork.id}" value="${courseWork.id}" required>
+                                <label class="form-check-label" for="dailyWork${courseWork.id}">
+                                    ${courseWork.name}
+                                </label>
+                            </div>
+                        `;
+                        courseWorkList.appendChild(listItem);
+                    });
+                });
+
+            document.getElementById('gradeModal').style.display = 'block';
+            }
+
+            function closeGradeModal() {
+                document.getElementById('gradeModal').style.display = 'none';
+            }
+
+            document.getElementById('gradeForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const studentId = document.getElementById('studentId').value;
+                const courseId = document.getElementById('courseId').value;
+                const dailyWorkId = document.querySelector('input[name="dailyWorkId"]:checked').value;
+                const grade = document.getElementById('grade').value;
+
+                fetch('/api/grades', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        student_id: studentId,
+                        course_id: courseId,
+                        daily_work_id: dailyWorkId,
+                        grade: grade
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    closeGradeModal();
+                });
             });
         </script>
     @endsection
