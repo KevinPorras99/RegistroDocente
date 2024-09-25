@@ -229,7 +229,7 @@
                             <th>Fecha de Entrega</th>
                             <th>Ciclo</th>
                             <th>Archivo</th>
-                            <th>Valor</th> <!-- Nueva columna para el porcentaje -->
+                            <th>Valor porcentual</th> <!-- Nueva columna para el porcentaje -->
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -265,6 +265,9 @@
                                             <i class="fas fa-trash" style="color: red; font-size: 1rem;"></i>
                                         </button>
                                     </form>
+                                    <a href="{{ route('dailyWorks.showAddGradesForm', ['courseId' => $dailyWork->course_id, 'cycle' => $dailyWork->cycle]) }}" class="btn btn-sm btn-primary">
+                                        Añadir Calificaciones
+                                    </a>
                                 </td>
                             </tr>
                         @empty
@@ -281,63 +284,6 @@
             </div>
         </div>
 
-        <!-- Lista de estudiantes enlazados al curso -->
-        <div class="container mt-5">
-            <h2>Lista de Estudiantes</h2>
-            @if(empty($students))
-                <p>No hay estudiantes enlazados a este curso.</p>
-            @else
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Institución</th>
-                            <th>Sección</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($students as $student)
-                        <tr>
-                            <td>{{ $student->name }}</td>
-                            <td>{{ $student->institution }}</td>
-                            <td>{{ $student->section }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary" onclick="openAddGradeModal({{ $student->id }})">
-                                    <i class="fas fa-plus"></i> Añadir Calificaciones
-                                </button>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @endif
-        </div>
-
-        
-                
-        <!-- Modal para añadir calificaciones -->
-        <div id="gradeModal" class="modal" style="display: none;">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Añadir Calificaciones</h5>
-                        <button type="button" class="close" onclick="closeGradeModal()">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="addGradeForm" method="POST" action="{{ route('grades.store') }}">
-                            @csrf
-                            <input type="hidden" id="student_id" name="student_id">
-                            <div id="dailyWorksContainer">
-                                <!-- Aquí se cargarán los trabajos cotidianos -->
-                            </div>
-                            <button type="submit" class="btn btn-primary">Guardar Calificaciones</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 
 @section('scripts')

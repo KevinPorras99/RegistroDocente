@@ -9,6 +9,7 @@ use App\Models\Grade;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
+use App\Models\DailyWorkGrade;
 
 class DailyWorkController extends Controller
 {
@@ -175,10 +176,13 @@ class DailyWorkController extends Controller
             'grades.*' => 'nullable|integer|min:0|max:100',
         ]);
 
-        foreach ($request->grades as $dailyWorkId => $grade) {
-            $dailyWork = DailyWork::findOrFail($dailyWorkId);
-            $dailyWork->grade = $grade;
-            $dailyWork->save();
+        foreach ($request->grades as $dailyWorkId => $grades) {
+            foreach ($grades as $studentId => $grade) {
+                DailyWorkGrade::updateOrCreate(
+                    ['daily_work_id' => $dailyWorkId, 'student_id' => $studentId],
+                    ['grade' => $grade]
+                );
+            }
         }
 
         return redirect()->route('courses.show', $courseId)->with('success', 'Calificaciones actualizadas exitosamente.');

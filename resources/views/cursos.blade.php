@@ -60,7 +60,7 @@
                                         <input type="text" class="form-control" id="add-institution" name="institution" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="add-classroom">Aula</label>
+                                        <label for="add-classroom">Grupo</label>
                                         <input type="text" class="form-control" id="add-classroom" name="classroom" required>
                                     </div>
                                     <div class="form-group">
@@ -180,7 +180,7 @@
                                         <input type="text" class="form-control" id="edit-institution" name="institution" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="edit-classroom">Aula</label>
+                                        <label for="edit-classroom">Grupo</label>
                                         <input type="text" class="form-control" id="edit-classroom" name="classroom" required>
                                     </div>
                                     <div class="form-group">

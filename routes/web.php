@@ -75,3 +75,11 @@ Route::get('/students/{student}/dailyWorks', [StudentController::class, 'getDail
 
 Route::get('/students/create', [StudentController::class, 'create'])->name('students.create');
 Route::post('/students', [StudentController::class, 'store'])->name('students.store');
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/courses/{courseId}/grades/{cycle}', [DailyWorkController::class, 'showAddGradesForm'])->name('dailyWorks.showAddGradesForm');
+    Route::post('/courses/{courseId}/grades', [DailyWorkController::class, 'storeGrades'])->name('dailyWorks.storeGrades');
+    Route::post('/grades/store', [DailyWorkController::class, 'storeGrades'])->name('grades.store');
+});
+

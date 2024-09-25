@@ -19,5 +19,10 @@ class DailyWork extends Model
         return $this->belongsTo(Course::class);
     }
 
+    public function grades()
+    {
+        return $this->hasMany(DailyWorkGrade::class);
+    }
+
     
 }

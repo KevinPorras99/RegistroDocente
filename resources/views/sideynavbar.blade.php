@@ -43,11 +43,11 @@
         </div>
         <div class="user-menu">
             <div class="user-menu img">
-                @if($user->profile_image)
-                    <img src="{{ asset('storage/' . $user->profile_image) }}" alt="{{ $user->name }}">
+                @if(auth()->user()->profile_image)
+                    <img src="{{ asset('storage/' . auth()->user()->profile_image) }}" alt="{{ auth()->user()->name }}">
                 @else
                     <div class="initials">
-                        {{ strtoupper(substr($user->name, 0, 1)) . strtoupper(substr($user->surname, 0, 1)) }}
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) . strtoupper(substr(auth()->user()->surname, 0, 1)) }}
                     </div>
                 @endif
             </div>
@@ -72,11 +72,11 @@
             <span class="close" onclick="closeProfileModal()">&times;</span>
             <h2>Perfil</h2>
             <div class="container">
-                @if($user->profile_image)
-                    <img src="{{ asset('storage/' . $user->profile_image) }}" alt="{{ $user->name }}" class="profile-picture img">
+                @if(auth()->user()->profile_image)
+                    <img src="{{ asset('storage/' . auth()->user()->profile_image) }}" alt="{{ auth()->user()->name }}" class="profile-picture img">
                 @else
                     <div class="initials-modal">
-                        {{ strtoupper(substr($user->name, 0, 1)) . strtoupper(substr($user->surname, 0, 1)) }}
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) . strtoupper(substr(auth()->user()->surname, 0, 1)) }}
                     </div>
                 @endif
 
@@ -94,10 +94,10 @@
             </div>
             <div class="profile-info">
                 <label for="fullName">Nombre Completo:</label>
-                <input type="text" id="fullName" value="{{ $user->name }} {{ $user->surname }}" readonly>
+                <input type="text" id="fullName" value="{{ auth()->user()->name }} {{ auth()->user()->surname }}" readonly>
 
                 <label for="email">Correo Electrónico:</label>
-                <input type="email" id="email" value="{{ $user->email }}" readonly>
+                <input type="email" id="email" value="{{ auth()->user()->email }}" readonly>
                 <a href="{{ route('password.request') }}" class="text-gray" style="font-size: 16px;">Cambiar contraseña</a>
             </div>
         </div>
