@@ -55,4 +55,15 @@ Route::delete('/profile/delete', [SessionController::class, 'deleteProfileImage'
 Route::get('/estudiantes/download-template', [StudentController::class, 'downloadTemplate'])->name('students.downloadTemplate');
 Route::post('/estudiantes/upload-excel', [StudentController::class, 'uploadExcel'])->name('students.uploadExcel');
 
-Route::post('/grades', [GradeController::class, 'store'])->name('grades.store');
+Route::get('courses/{course}/cycles/{cycle}/daily-works', [DailyWorkController::class, 'getDailyWorks'])->name('dailyWorks.getDailyWorks');
+Route::post('grades/store', [GradeController::class, 'store'])->name('grades.store');
+
+
+Route::get('courses/{course}/cycles/{cycle}/grades', [GradeController::class, 'showAddGradesForm'])->name('grades.showAddForm');
+Route::post('courses/{course}/cycles/{cycle}/grades', [GradeController::class, 'store'])->name('grades.store');
+
+Route::get('/cursos/{course}/ciclos/{cycle}/calificaciones', [GradeController::class, 'showAddGradesForm'])->name('grades.showAddForm');
+Route::post('/calificaciones', [GradeController::class, 'store'])->name('grades.store');
+
+Route::get('/cursos/{course}/ciclos/{cycle}/calificaciones', [GradeController::class, 'showAddGradesForm'])->name('grades.showAddForm')->middleware('auth');
+Route::post('/courses/{course}/dailyWorks', [DailyWorkController::class, 'storeDailyWork'])->name('courses.dailyWorks.store');

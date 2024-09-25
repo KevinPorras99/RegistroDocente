@@ -1,14 +1,14 @@
 <?php
-// app/Http/Controllers/DailyWorkController.php
 
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\DailyWork;
 use App\Models\Course;
-use App\Models\Grade; // Importar el modelo Grade
+use App\Models\Grade;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\User;
 
 class DailyWorkController extends Controller
 {
@@ -24,7 +24,10 @@ class DailyWorkController extends Controller
         $cycle = $request->input('cycle');
         $user = Auth::user();
 
-        $dailyWorks = $user->dailyWorks()
+        $dailyWorks = DailyWork::with('course')
+            ->whereHas('course', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
             ->when($search, function ($query, $search) {
                 return $query->where('name', 'like', "%{$search}%")
                              ->orWhere('description', 'like', "%{$search}%")
@@ -48,36 +51,49 @@ class DailyWorkController extends Controller
             }
         }
 
-        return view('trabajocotidiano', compact('dailyWorks', 'user', 'courses', 'students', 'courseId'));
+        return view('trabajocotidiano', compact('dailyWorks', 'user', 'courses', 'students', 'courseId', 'cycle'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'required|string|max:255',
+            'description' => 'required|string',
             'due_date' => 'required|date',
-            'course_id' => 'required|exists:courses,id',
+            'course_id' => 'required|integer',
             'cycle' => 'required|string',
-            'file' => 'nullable|file|mimes:pdf,txt,doc,docx|max:2048',
+            'file' => 'nullable|file|mimes:pdf,txt,doc,docx',
         ]);
-
-        $dailyWork = new DailyWork();
-        $dailyWork->name = $request->input('name');
-        $dailyWork->description = $request->input('description');
-        $dailyWork->due_date = $request->input('due_date');
-        $dailyWork->course_id = $request->input('course_id');
-        $dailyWork->cycle = $request->input('cycle');
-        $dailyWork->user_id = Auth::id();
-
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $path = $file->store('dailyWorks', 'public');
-            $dailyWork->file_path = $path;
+    
+        $course = Course::findOrFail($request->course_id);
+        $dailyWorks = $course->dailyWorks()->where('cycle', $request->cycle)->get();
+    
+        // Calcular el nuevo porcentaje para cada trabajo cotidiano en el ciclo específico
+        $newPercentage = $course->daily_work_percentage / ($dailyWorks->count() + 1);
+    
+        // Actualizar el porcentaje de los trabajos cotidianos existentes en el ciclo específico
+        foreach ($dailyWorks as $dailyWork) {
+            $dailyWork->percentage = $newPercentage;
+            $dailyWork->save();
         }
+    
+        // Crear el nuevo trabajo cotidiano
+        $dailyWork = new DailyWork();
+        $dailyWork->name = $request->name;
+        $dailyWork->description = $request->description;
+        $dailyWork->due_date = $request->due_date;
+        $dailyWork->course_id = $request->course_id;
+        $dailyWork->cycle = $request->cycle;
+        $dailyWork->percentage = $newPercentage;
+    
+        if ($request->hasFile('file')) {
+            $filePath = $request->file('file')->store('daily_works');
+            $dailyWork->file_path = $filePath;
+        }
+    
         $dailyWork->save();
-
-        return redirect()->route('dailyWorks.index')->with('success', 'Trabajo cotidiano agregado exitosamente');
+    
+        return redirect()->route('dailyWorks.index')->with('success', 'Trabajo cotidiano agregado exitosamente.');
     }
 
     public function update(Request $request, $id)
@@ -128,34 +144,48 @@ class DailyWorkController extends Controller
         return redirect()->route('dailyWorks.index');
     }
 
-    public function getCourseWorks($courseId, $studentId, Request $request)
+    public function showAddGradesForm($courseId, $cycle)
     {
-        $cycle = $request->input('cycle');
+        $course = Course::findOrFail($courseId);
+        $students = $course->students;
+        $dailyWorks = DailyWork::where('course_id', $courseId)->where('cycle', $cycle)->get();
+        $user = auth()->user();
 
-        $courseWorks = DailyWork::where('course_id', $courseId)
-                                ->when($cycle, function ($query, $cycle) {
-                                    return $query->where('cycle', $cycle);
-                                })
-                                ->get();
-        return response()->json($courseWorks);
+        foreach ($dailyWorks as $dailyWork) {
+            $dailyWork->grades = $dailyWork->grades()->pluck('grade', 'student_id')->toArray();
+        }
+
+        return view('add-grades', compact('course', 'students', 'dailyWorks', 'cycle', 'user'));
     }
 
-    public function storeGrade(Request $request)
+    public function storeGrades(Request $request, $courseId)
     {
         $request->validate([
-            'student_id' => 'required|exists:students,id',
-            'course_id' => 'required|exists:courses,id',
-            'daily_work_id' => 'required|exists:daily_works,id',
-            'grade' => 'required|numeric|min:0|max:100',
+            'grades' => 'required|array',
+            'grades.*' => 'nullable|integer|min:0|max:100',
         ]);
 
-        Grade::create([
-            'student_id' => $request->input('student_id'),
-            'course_id' => $request->input('course_id'),
-            'daily_work_id' => $request->input('daily_work_id'),
-            'grade' => $request->input('grade'),
-        ]);
+        foreach ($request->grades as $dailyWorkId => $grade) {
+            $dailyWork = DailyWork::findOrFail($dailyWorkId);
+            $dailyWork->grade = $grade;
+            $dailyWork->save();
+        }
 
-        return response()->json(['message' => 'Calificación guardada exitosamente']);
+        return redirect()->route('courses.show', $courseId)->with('success', 'Calificaciones actualizadas exitosamente.');
+    }
+
+    public function getDailyWorks($courseId, $cycle)
+    {
+        $dailyWorks = DailyWork::where('course_id', $courseId)->where('cycle', $cycle)->get();
+        return response()->json(['dailyWorks' => $dailyWorks]);
+    }
+
+    public function showDailyTasks($courseId, $cycle)
+    {
+        $course = Course::findOrFail($courseId);
+        $students = $course->students;
+        $user = Auth::user();
+
+        return view('trabajocotidiano', compact('course', 'students', 'courseId', 'cycle', 'user'));
     }
 }

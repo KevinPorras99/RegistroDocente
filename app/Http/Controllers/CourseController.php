@@ -15,8 +15,6 @@ class CourseController extends Controller
         $this->middleware('auth');
     }
 
-    
-    
     public function index(Request $request)
     {
         $search = $request->input('search');
@@ -46,8 +44,21 @@ class CourseController extends Controller
             'grade' => 'required|string|max:255',
             'institution' => 'required|string|max:255',
             'cycle' => 'required|string|in:Trimestre,Cuatrimestre,Semestre',
+            'cycle_number' => 'required|string|max:255',
             'classroom' => 'required|string|max:255',
+            'daily_work_percentage' => 'required|integer|min:0|max:100',
+            'exam_percentage' => 'required|integer|min:0|max:100',
+            'assignment_percentage' => 'required|integer|min:0|max:100',
+            'conduct_percentage' => 'required|integer|min:0|max:100',
+            'attendance_percentage' => 'required|integer|min:0|max:100',
         ]);
+
+        // Verificar que la suma de los porcentajes sea 100%
+        $totalPercentage = $request->daily_work_percentage + $request->exam_percentage + $request->assignment_percentage + $request->conduct_percentage + $request->attendance_percentage;
+
+        if ($totalPercentage !== 100) {
+            return back()->withErrors(['message' => 'La suma de los porcentajes debe ser 100%.']);
+        }
 
         // Crear un nuevo curso y asociarlo con el usuario autenticado
         $course = new Course();
@@ -56,6 +67,12 @@ class CourseController extends Controller
         $course->institution = $request->input('institution');
         $course->classroom = $request->input('classroom');
         $course->cycle = $request->input('cycle');
+        $course->cycle_number = $request->input('cycle_number');
+        $course->daily_work_percentage = $request->input('daily_work_percentage');
+        $course->exam_percentage = $request->input('exam_percentage');
+        $course->assignment_percentage = $request->input('assignment_percentage');
+        $course->conduct_percentage = $request->input('conduct_percentage');
+        $course->attendance_percentage = $request->input('attendance_percentage');
         $course->user_id = Auth::id(); // Asociar el curso con el usuario autenticado
         $course->save();
 
@@ -73,8 +90,21 @@ class CourseController extends Controller
             'grade' => 'required|string|max:255',
             'institution' => 'required|string|max:255',
             'cycle' => 'required|string|in:Trimestre,Cuatrimestre,Semestre',
+            'cycle_number' => 'required|string|max:255',
             'classroom' => 'required|string|max:255',
+            'daily_work_percentage' => 'required|integer|min:0|max:100',
+            'exam_percentage' => 'required|integer|min:0|max:100',
+            'assignment_percentage' => 'required|integer|min:0|max:100',
+            'conduct_percentage' => 'required|integer|min:0|max:100',
+            'attendance_percentage' => 'required|integer|min:0|max:100',
         ]);
+
+        // Verificar que la suma de los porcentajes sea 100%
+        $totalPercentage = $request->daily_work_percentage + $request->exam_percentage + $request->assignment_percentage + $request->conduct_percentage + $request->attendance_percentage;
+
+        if ($totalPercentage !== 100) {
+            return back()->withErrors(['message' => 'La suma de los porcentajes debe ser 100%.']);
+        }
 
         // Actualizar el curso
         $course->name = $request->input('name');
@@ -82,6 +112,12 @@ class CourseController extends Controller
         $course->institution = $request->input('institution');
         $course->classroom = $request->input('classroom');
         $course->cycle = $request->input('cycle');
+        $course->cycle_number = $request->input('cycle_number');
+        $course->daily_work_percentage = $request->input('daily_work_percentage');
+        $course->exam_percentage = $request->input('exam_percentage');
+        $course->assignment_percentage = $request->input('assignment_percentage');
+        $course->conduct_percentage = $request->input('conduct_percentage');
+        $course->attendance_percentage = $request->input('attendance_percentage');
         $course->save();
 
         // Redirigir a la lista de cursos con un mensaje de éxito
@@ -103,13 +139,13 @@ class CourseController extends Controller
 
     public function assignStudents(Request $request)
     {
-    $courseId = $request->input('course_id');
-    $studentIds = $request->input('student_ids', []);
+        $courseId = $request->input('course_id');
+        $studentIds = $request->input('student_ids', []);
 
-    $course = Course::find($courseId);
-    $course->students()->sync($studentIds);
+        $course = Course::find($courseId);
+        $course->students()->sync($studentIds);
 
-    return redirect()->route('courses.index')->with('success', 'Estudiantes asignados correctamente.');
+        return redirect()->route('courses.index')->with('success', 'Estudiantes asignados correctamente.');
     }
 
     public function show($courseId)

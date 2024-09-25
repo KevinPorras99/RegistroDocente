@@ -10,15 +10,14 @@ class DailyWork extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'due_date'];
+    protected $fillable = [
+        'name', 'description', 'due_date', 'course_id', 'cycle', 'percentage'
+    ];
 
     public function course()
     {
         return $this->belongsTo(Course::class);
     }
 
-    public function grades()
-    {
-        return $this->hasMany(Grade::class);
-    }
+    
 }

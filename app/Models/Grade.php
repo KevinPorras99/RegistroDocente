@@ -15,11 +15,6 @@ class Grade extends Model
         return $this->belongsTo(Student::class);
     }
 
-    public function course()
-    {
-        return $this->belongsTo(Course::class);
-    }
-
     public function dailyWork()
     {
         return $this->belongsTo(DailyWork::class);

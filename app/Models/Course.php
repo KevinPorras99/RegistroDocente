@@ -10,10 +10,19 @@ class Course extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'grade', 'institution', 'classroom', 'cycle',];
+    protected $fillable = [
+        'name', 'grade', 'institution', 'classroom', 'cycle',
+        'daily_work_percentage', 'exam_percentage', 'assignment_percentage',
+        'conduct_percentage', 'attendance_percentage', 'user_id'
+    ];
 
     public function students()
     {
         return $this->belongsToMany(Student::class);
+    }
+
+    public function dailyWorks()
+    {
+        return $this->hasMany(DailyWork::class);
     }
 }

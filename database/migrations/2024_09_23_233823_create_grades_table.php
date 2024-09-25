@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -10,10 +9,9 @@ class CreateGradesTable extends Migration
     {
         Schema::create('grades', function (Blueprint $table) {
             $table->id();
+            $table->integer('grade');
             $table->foreignId('student_id')->constrained()->onDelete('cascade');
-            $table->foreignId('course_id')->constrained()->onDelete('cascade');
             $table->foreignId('daily_work_id')->constrained()->onDelete('cascade');
-            $table->decimal('grade', 5, 2);
             $table->timestamps();
         });
     }
