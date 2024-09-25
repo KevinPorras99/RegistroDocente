@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -8,15 +9,15 @@ class Grade extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['student_id', 'course_id', 'daily_work_id', 'grade'];
+    protected $fillable = [
+        'student_id',
+        'subject',
+        'type',
+        'score',
+    ];
 
     public function student()
     {
         return $this->belongsTo(Student::class);
-    }
-
-    public function dailyWork()
-    {
-        return $this->belongsTo(DailyWork::class);
     }
 }

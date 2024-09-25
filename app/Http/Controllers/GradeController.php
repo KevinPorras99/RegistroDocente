@@ -31,22 +31,20 @@ class GradeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'course_id' => 'required|integer',
-            'cycle' => 'required|string',
+            'student_id' => 'required|exists:students,id',
             'grades' => 'required|array',
-            'grades.*.*' => 'nullable|integer|min:0|max:100',
+            'grades.*' => 'required|numeric|min:0|max:100',
         ]);
 
-        foreach ($request->grades as $studentId => $dailyWorks) {
-            foreach ($dailyWorks as $dailyWorkId => $grade) {
-                $dailyWork = DailyWork::findOrFail($dailyWorkId);
-                $dailyWork->grades()->updateOrCreate(
-                    ['student_id' => $studentId],
-                    ['grade' => $grade]
-                );
-            }
+        foreach ($request->grades as $dailyWorkId => $score) {
+            Grade::create([
+                'student_id' => $request->student_id,
+                'subject' => DailyWork::find($dailyWorkId)->name,
+                'type' => 'Trabajo Cotidiano',
+                'score' => $score,
+            ]);
         }
 
-        return redirect()->route('courses.show', $request->course_id)->with('success', 'Calificaciones actualizadas exitosamente.');
+        return redirect()->back()->with('success', 'Calificaciones guardadas exitosamente.');
     }
 }

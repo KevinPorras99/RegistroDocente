@@ -57,7 +57,7 @@
         </div>
 
         <!-- Modal para agregar trabajo cotidiano -->
-        <div id="addDailyWorkModal" class="modal" style="display: none;">
+        <div id="addDailyWorkModal" class="modal" style="display: {{ $errors->any() ? 'block' : 'none' }};">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -65,38 +65,66 @@
                         <button type="button" class="close" onclick="closeAddDailyWorkModal()">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <form id="addDailyWorkForm" action="{{ route('dailyWorks.store') }}" method="POST"
-                            enctype="multipart/form-data">
+                        <form id="addDailyWorkForm" action="{{ route('dailyWorks.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="form-group">
                                 <label for="name">Nombre</label>
-                                <input type="text" class="form-control" id="add-name" name="name" required>
+                                <input type="text" class="form-control" id="add-name" name="name" value="{{ old('name') }}" required>
+                                @if ($errors->has('name'))
+                                    <span class="text-danger">{{ $errors->first('name') }}</span>
+                                @endif
                             </div>
                             <div class="form-group">
                                 <label for="description">Descripción</label>
-                                <textarea class="form-control" id="add-description" name="description" required></textarea>
+                                <textarea class="form-control" id="add-description" name="description" required>{{ old('description') }}</textarea>
+                                @if ($errors->has('description'))
+                                    <span class="text-danger">{{ $errors->first('description') }}</span>
+                                @endif
                             </div>
                             <div class="form-group">
                                 <label for="due_date">Fecha de Entrega</label>
-                                <input type="date" class="form-control" id="add-due_date" name="due_date" required>
+                                <input type="date" class="form-control" id="add-due_date" name="due_date" value="{{ old('due_date') }}" required>
+                                @if ($errors->has('due_date'))
+                                    <span class="text-danger">{{ $errors->first('due_date') }}</span>
+                                @endif
                             </div>
                             <div class="form-group">
                                 <label for="course">Curso</label>
-                                <select id="add-course" name="course_id" class="form-control">
+                                <select id="add-course" name="course_id" class="form-control" required>
+                                    <option value="">Seleccione un curso</option>
                                     @foreach($courses as $course)
-                                        <option value="{{ $course->id }}" data-cycles="{{ $course->cycle }}">{{ $course->name }}</option>
+                                        <option value="{{ $course->id }}" data-cycles="{{ $course->cycle }}" {{ old('course_id') == $course->id ? 'selected' : '' }}>{{ $course->name }}</option>
                                     @endforeach
                                 </select>
+                                @if ($errors->has('course_id'))
+                                    <span class="text-danger">{{ $errors->first('course_id') }}</span>
+                                @endif
                             </div>
                             <div class="form-group">
                                 <label for="cycle">Ciclo</label>
                                 <select id="add-cycle" name="cycle" class="form-control" required>
-                                    <!-- Opciones de ciclo se actualizarán dinámicamente -->
+                                    <option value="">Seleccione un ciclo</option>
                                 </select>
+                                @if ($errors->has('cycle'))
+                                    <span class="text-danger">{{ $errors->first('cycle') }}</span>
+                                @endif
+                            </div>
+                            <div class="form-group">
+                                <label for="percentage">Porcentaje</label>
+                                <small id="totalPercentageInfo" class="form-text text-muted"></small> <!-- Aquí se mostrará el porcentaje total permitido -->
+                                <small id="percentageInfo" class="form-text text-muted"></small>
+                                <input type="number" class="form-control" id="percentage" name="percentage" value="{{ old('percentage') }}" required min="0">
+                                <small id="allowedPercentageInfo" class="form-text text-muted"></small>
+                                @if ($errors->has('percentage'))
+                                    <span class="text-danger">{{ $errors->first('percentage') }}</span>
+                                @endif
                             </div>
                             <div class="form-group">
                                 <label for="file">Archivo</label>
                                 <input type="file" class="form-control" id="add-file" name="file">
+                                @if ($errors->has('file'))
+                                    <span class="text-danger">{{ $errors->first('file') }}</span>
+                                @endif
                             </div>
                             <button type="submit" class="btn btn-primary">Agregar</button>
                         </form>
@@ -140,33 +168,42 @@
                             @method('PUT')
                             <div class="form-group">
                                 <label for="edit-name">Nombre</label>
-                                <input type="text" class="form-control" id="edit-name" name="name" required>
+                                <input type="text" id="edit-name" name="name" class="form-control" required>
                             </div>
                             <div class="form-group">
                                 <label for="edit-description">Descripción</label>
-                                <textarea class="form-control" id="edit-description" name="description" required></textarea>
+                                <textarea id="edit-description" name="description" class="form-control" required></textarea>
                             </div>
                             <div class="form-group">
                                 <label for="edit-due_date">Fecha de Entrega</label>
-                                <input type="date" class="form-control" id="edit-due_date" name="due_date" required>
+                                <input type="date" id="edit-due_date" name="due_date" class="form-control" required>
                             </div>
                             <div class="form-group">
                                 <label for="edit-course">Curso</label>
-                                <select id="edit-course" name="course_id" class="form-control">
-                                    @foreach($courses as $course)
-                                        <option value="{{ $course->id }}" data-cycles="{{ $course->cycle }}">{{ $course->name }}</option>
+                                <select id="edit-course" name="course_id" class="form-control" required>
+                                    <!-- Opciones de curso -->
+                                    @foreach ($courses as $course)
+                                        <option value="{{ $course->id }}" data-cycles="{{ $course->cycle }}">
+                                            {{ $course->name }} - {{ $course->grade }} - {{ $course->institution }} - {{ $course->classroom }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="edit-cycle">Ciclo</label>
                                 <select id="edit-cycle" name="cycle" class="form-control" required>
-                                    <!-- Opciones de ciclo se actualizarán dinámicamente -->
+                                    <!-- Opciones de ciclo -->
                                 </select>
                             </div>
                             <div class="form-group">
+                                <label for="edit-percentage">Porcentaje</label>
+                                <input type="number" id="edit-percentage" name="percentage" class="form-control" required>
+                                <span id="edit-percentageInfo"></span>
+                                <span id="edit-allowedPercentageInfo"></span>
+                            </div>
+                            <div class="form-group">
                                 <label for="edit-file">Archivo</label>
-                                <input type="file" class="form-control" id="edit-file" name="file">
+                                <input type="file" id="edit-file" name="file" class="form-control">
                             </div>
                             <button type="submit" class="btn btn-primary">Guardar</button>
                         </form>
@@ -266,7 +303,9 @@
                             <td>{{ $student->institution }}</td>
                             <td>{{ $student->section }}</td>
                             <td>
-                                <button class="btn btn-primary" onclick="openGradeModal({{ $student->id }}, {{ $student->course_id }}, '{{ $student->cycle }}')">Añadir Calificación</button>
+                                <button class="btn btn-sm btn-primary" onclick="openAddGradeModal({{ $student->id }})">
+                                    <i class="fas fa-plus"></i> Añadir Calificaciones
+                                </button>
                             </td>
                         </tr>
                         @endforeach
@@ -275,25 +314,24 @@
             @endif
         </div>
 
+        
+                
         <!-- Modal para añadir calificaciones -->
         <div id="gradeModal" class="modal" style="display: none;">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Añadir Calificación</h5>
+                        <h5 class="modal-title">Añadir Calificaciones</h5>
                         <button type="button" class="close" onclick="closeGradeModal()">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <form id="gradeForm" action="{{ route('grades.store') }}" method="POST">
+                        <form id="addGradeForm" method="POST" action="{{ route('grades.store') }}">
                             @csrf
-                            <input type="hidden" id="studentId" name="student_id">
-                            <input type="hidden" id="courseId" name="course_id">
-                            <input type="hidden" id="cycle" name="cycle">
-                            <div class="form-group">
-                                <label for="grade">Calificación</label>
-                                <input type="number" class="form-control" id="grade" name="grade" required>
+                            <input type="hidden" id="student_id" name="student_id">
+                            <div id="dailyWorksContainer">
+                                <!-- Aquí se cargarán los trabajos cotidianos -->
                             </div>
-                            <button type="submit" class="btn btn-primary">Guardar</button>
+                            <button type="submit" class="btn btn-primary">Guardar Calificaciones</button>
                         </form>
                     </div>
                 </div>
@@ -338,6 +376,7 @@
         document.getElementById('edit-name').value = dailyWork.name;
         document.getElementById('edit-description').value = dailyWork.description;
         document.getElementById('edit-due_date').value = dailyWork.due_date;
+        document.getElementById('edit-percentage').value = dailyWork.percentage;
 
         // Precargar el curso y ciclo
         document.getElementById('edit-course').value = dailyWork.course_id;
@@ -404,9 +443,9 @@
         createCycleOptions(cycles, selectedCycle, 'edit-cycle');
     }
 
-    document.getElementById('courseSelect').addEventListener('change', function() {
-        updateCycleOptions();
-        document.getElementById('filterForm').submit();
+    document.getElementById('edit-course').addEventListener('change', function() {
+        updateEditCycleOptions(this.value, null);
+        updateEditAllowedPercentage();
     });
 
     document.getElementById('cycleSelect').addEventListener('change', function() {
@@ -419,6 +458,11 @@
 
     document.getElementById('add-course').addEventListener('change', function() {
         updateAddCycleOptions();
+        updateAllowedPercentage();
+    });
+
+    document.getElementById('add-cycle').addEventListener('change', function() {
+        updateAllowedPercentage();
     });
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -459,28 +503,104 @@
         }
     });
 
-    // Lógica para dividir el porcentaje de trabajos cotidianos
-    document.getElementById('addDailyWorkForm').addEventListener('submit', function(event) {
+    // Actualizar el porcentaje permitido para trabajos cotidianos
+    function updateAllowedPercentage() {
         const courseId = document.getElementById('add-course').value;
-        fetch(`/courses/${courseId}/dailyWorks`)
+        const cycle = document.getElementById('add-cycle').value;
+        if (courseId && cycle) {
+            fetch(`/courses/${courseId}/allowedPercentage?cycle=${cycle}`)
+                .then(response => response.json())
+                .then(data => {
+                    const allowedPercentage = data.allowedPercentage;
+                    const totalPercentage = data.totalPercentage;
+                    document.getElementById('percentage').max = allowedPercentage;
+                    document.getElementById('percentageInfo').innerText = `Porcentaje disponible: ${allowedPercentage}% de un total de ${totalPercentage}%.`;
+                    document.getElementById('allowedPercentageInfo').innerText = `Puedes asignar un porcentaje entre 0 y ${allowedPercentage}.`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    }
+
+    function updateEditAllowedPercentage() {
+        const courseId = document.getElementById('edit-course').value;
+        const cycle = document.getElementById('edit-cycle').value;
+        if (courseId && cycle) {
+            fetch(`/courses/${courseId}/allowedPercentage?cycle=${cycle}`)
+                .then(response => response.json())
+                .then(data => {
+                    const allowedPercentage = data.allowedPercentage;
+                    const totalPercentage = data.totalPercentage;
+                    document.getElementById('edit-percentage').max = allowedPercentage;
+                    document.getElementById('edit-percentageInfo').innerText = `Porcentaje disponible: ${allowedPercentage}% de un total de ${totalPercentage}%.`;
+                    document.getElementById('edit-allowedPercentageInfo').innerText = `Puedes asignar un porcentaje entre 0 y ${allowedPercentage}.`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    }
+
+    document.getElementById('add-course').addEventListener('change', function() {
+        updateAddCycleOptions();
+        updateAllowedPercentage();
+    });
+
+    document.getElementById('add-cycle').addEventListener('change', function() {
+        updateAllowedPercentage();
+    });
+
+    document.getElementById('addDailyWorkForm').addEventListener('submit', function(event) {
+        const percentage = parseInt(document.getElementById('percentage').value) || 0;
+        const maxPercentage = parseInt(document.getElementById('percentage').max) || 0;
+
+        if (percentage > maxPercentage) {
+            event.preventDefault();
+            alert(`El porcentaje no puede exceder el ${maxPercentage}%.`);
+        }
+    });
+
+    document.getElementById('editDailyWorkForm').addEventListener('submit', function(event) {
+        const percentage = parseInt(document.getElementById('edit-percentage').value) || 0;
+        const maxPercentage = parseInt(document.getElementById('edit-percentage').max) || 0;
+
+        if (percentage > maxPercentage) {
+            event.preventDefault();
+            alert(`El porcentaje no puede exceder el ${maxPercentage}%.`);
+        }
+    });
+
+    // Funciones para manejar el modal de añadir calificaciones
+    function openAddGradeModal(studentId) {
+        document.getElementById('student_id').value = studentId;
+        fetchDailyWorks(studentId);
+        document.getElementById('gradeModal').style.display = 'block';
+    }
+
+    function closeGradeModal() {
+        document.getElementById('gradeModal').style.display = 'none';
+    }
+
+    function fetchDailyWorks(studentId) {
+        fetch(`/students/${studentId}/dailyWorks`)
             .then(response => response.json())
             .then(data => {
-                const dailyWorks = data.dailyWorks;
-                const dailyWorkPercentage = parseInt(document.getElementById('dailyWorkPercentage').value) || 0;
-                const newPercentage = dailyWorkPercentage / (dailyWorks.length + 1);
+                const dailyWorksContainer = document.getElementById('dailyWorksContainer');
+                dailyWorksContainer.innerHTML = '';
 
-                dailyWorks.forEach(dailyWork => {
-                    dailyWork.percentage = newPercentage;
-                    // Aquí deberías hacer una llamada AJAX para actualizar el porcentaje de cada trabajo cotidiano
+                data.dailyWorks.forEach(dailyWork => {
+                    const div = document.createElement('div');
+                    div.classList.add('form-group');
+                    div.innerHTML = `
+                        <label for="dailyWork_${dailyWork.id}">${dailyWork.name} (${dailyWork.percentage}%)</label>
+                        <input type="number" class="form-control" id="dailyWork_${dailyWork.id}" name="grades[${dailyWork.id}]" min="0" max="100" required>
+                    `;
+                    dailyWorksContainer.appendChild(div);
                 });
-
-                // Establecer el nuevo porcentaje para el trabajo cotidiano que se va a agregar
-                document.getElementById('newDailyWorkPercentage').value = newPercentage;
             })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    });
+            .catch(error => console.error('Error:', error));
+    }
 
     // Ocultar el mensaje de éxito después de 3 segundos
     setTimeout(function() {

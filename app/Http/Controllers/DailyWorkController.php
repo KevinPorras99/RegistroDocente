@@ -9,6 +9,7 @@ use App\Models\Grade;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
+use App\Models\Student;
 
 class DailyWorkController extends Controller
 {
@@ -62,21 +63,18 @@ class DailyWorkController extends Controller
             'due_date' => 'required|date',
             'course_id' => 'required|integer',
             'cycle' => 'required|string',
+            'percentage' => 'required|integer|min:0',
             'file' => 'nullable|file|mimes:pdf,txt,doc,docx',
         ]);
-    
+
         $course = Course::findOrFail($request->course_id);
-        $dailyWorks = $course->dailyWorks()->where('cycle', $request->cycle)->get();
-    
-        // Calcular el nuevo porcentaje para cada trabajo cotidiano en el ciclo específico
-        $newPercentage = $course->daily_work_percentage / ($dailyWorks->count() + 1);
-    
-        // Actualizar el porcentaje de los trabajos cotidianos existentes en el ciclo específico
-        foreach ($dailyWorks as $dailyWork) {
-            $dailyWork->percentage = $newPercentage;
-            $dailyWork->save();
+        $totalPercentage = $course->dailyWorks()->where('cycle', $request->cycle)->sum('percentage');
+        $allowedPercentage = $course->daily_work_percentage - $totalPercentage;
+
+        if ($request->percentage > $allowedPercentage) {
+            return back()->withErrors(['percentage' => 'El porcentaje no puede exceder el porcentaje permitido para el curso.'])->withInput();
         }
-    
+
         // Crear el nuevo trabajo cotidiano
         $dailyWork = new DailyWork();
         $dailyWork->name = $request->name;
@@ -84,15 +82,22 @@ class DailyWorkController extends Controller
         $dailyWork->due_date = $request->due_date;
         $dailyWork->course_id = $request->course_id;
         $dailyWork->cycle = $request->cycle;
-        $dailyWork->percentage = $newPercentage;
-    
+        $dailyWork->percentage = $request->percentage;
+
         if ($request->hasFile('file')) {
             $filePath = $request->file('file')->store('daily_works');
             $dailyWork->file_path = $filePath;
         }
-    
+
         $dailyWork->save();
-    
+
+        // Crear enlaces entre estudiantes y el nuevo trabajo cotidiano
+        $students = Student::where('course_id', $request->course_id)->get();
+        foreach ($students as $student) {
+            $student->dailyWorks()->attach($dailyWork->id);
+        }
+
+
         return redirect()->route('dailyWorks.index')->with('success', 'Trabajo cotidiano agregado exitosamente.');
     }
 
@@ -106,14 +111,24 @@ class DailyWorkController extends Controller
             'due_date' => 'required|date',
             'course_id' => 'required|exists:courses,id',
             'cycle' => 'required|string',
+            'percentage' => 'required|integer|min:0',
             'file' => 'nullable|file|mimes:pdf,txt,doc,docx|max:2048',
         ]);
+
+        $course = Course::findOrFail($request->course_id);
+        $totalPercentage = $course->dailyWorks()->where('cycle', $request->cycle)->where('id', '!=', $id)->sum('percentage');
+        $allowedPercentage = $course->daily_work_percentage - $totalPercentage;
+
+        if ($request->percentage > $allowedPercentage) {
+            return back()->withErrors(['percentage' => 'El porcentaje no puede exceder el porcentaje permitido para el curso.'])->withInput();
+        }
 
         $dailyWork->name = $request->input('name');
         $dailyWork->description = $request->input('description');
         $dailyWork->due_date = $request->input('due_date');
         $dailyWork->course_id = $request->input('course_id');
         $dailyWork->cycle = $request->input('cycle');
+        $dailyWork->percentage = $request->input('percentage');
 
         if ($request->hasFile('file')) {
             if ($dailyWork->file_path) {
@@ -124,6 +139,7 @@ class DailyWorkController extends Controller
             $path = $file->store('dailyWorks', 'public');
             $dailyWork->file_path = $path;
         }
+
         $dailyWork->save();
 
         return redirect()->route('dailyWorks.index')->with('success', 'Trabajo cotidiano actualizado exitosamente');
@@ -187,5 +203,25 @@ class DailyWorkController extends Controller
         $user = Auth::user();
 
         return view('trabajocotidiano', compact('course', 'students', 'courseId', 'cycle', 'user'));
+    }
+
+    public function getAllowedPercentage(Request $request, $courseId)
+    {
+        $course = Course::findOrFail($courseId);
+        $cycle = $request->query('cycle');
+        $totalPercentage = $course->daily_work_percentage; // Suponiendo que `daily_work_percentage` es el campo que almacena el porcentaje total permitido
+        $usedPercentage = $course->dailyWorks()->where('cycle', $cycle)->sum('percentage');
+        $allowedPercentage = $totalPercentage - $usedPercentage;
+
+        return response()->json([
+            'allowedPercentage' => $allowedPercentage,
+            'totalPercentage' => $totalPercentage
+        ]);
+    }
+
+    public function getDailyWorksByCourseAndCycle($courseId, $cycle)
+    {
+        $dailyWorks = DailyWork::where('course_id', $courseId)->where('cycle', $cycle)->get();
+        return response()->json(['dailyWorks' => $dailyWorks]);
     }
 }
