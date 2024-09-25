@@ -17,47 +17,27 @@ Route::get('/', function () {
     return redirect()->route('login.index');
 })->middleware('guest');
 
-// Rutas relacionadas con estudiantes
 Route::resource('students', StudentController::class)->middleware('auth');
 Route::get('/estudiantes', [StudentController::class, 'index'])->name('estudiantes');
-Route::get('/estudiantes/download-template', [StudentController::class, 'downloadTemplate'])->name('students.downloadTemplate');
-Route::post('/estudiantes/upload-excel', [StudentController::class, 'uploadExcel'])->name('students.uploadExcel');
-Route::get('/students/{student}/dailyWorks', [StudentController::class, 'getDailyWorks']);
-Route::get('/students/create', [StudentController::class, 'create'])->name('students.create');
-Route::post('/students', [StudentController::class, 'store'])->name('students.store');
 
-// Rutas relacionadas con cursos
+
 Route::resource('courses', CourseController::class)->middleware('auth');
 Route::get('/cursos', [CourseController::class, 'index'])->name('cursos');
 Route::post('/cursos/assign-students', [CourseController::class, 'assignStudents'])->name('courses.assignStudents');
 Route::get('/cursos/{courseId}', [CourseController::class, 'show'])->name('courses.show');
 Route::get('/cursos/{id}/detalles', [CourseController::class, 'showDailyTask'])->name('courses.showDailyTask');
-Route::get('/cursos/{courseId}/student/{studentId}/courseworks', [DailyWorkController::class, 'getCourseWorks']);
-Route::post('/courses/{course}/dailyWorks', [DailyWorkController::class, 'storeDailyWork'])->name('courses.dailyWorks.store');
-Route::get('/courses/{courseId}/allowedPercentage', [DailyWorkController::class, 'getAllowedPercentage']);
 
-// Rutas relacionadas con tareas
+Route::get('/cursos/{courseId}/student/{studentId}/courseworks', [DailyWorkController::class, 'getCourseWorks']);
+
 Route::resource('tasks', TaskController::class)->middleware('auth');
 Route::get('/tareasyasignaciones', [TaskController::class, 'index'])->name('tareasyasignaciones');
 
-// Rutas relacionadas con trabajos cotidianos
 Route::resource('dailyWorks', DailyWorkController::class)->middleware('auth');
 Route::get('/trabajocotidiano', [DailyWorkController::class, 'index'])->name('trabajocotidiano');
-Route::get('courses/{course}/cycles/{cycle}/daily-works', [DailyWorkController::class, 'getDailyWorks'])->name('dailyWorks.getDailyWorks');
-Route::get('/dailyWorks/{courseId}/{cycle}', [DailyWorkController::class, 'getDailyWorksByCourseAndCycle']);
 
-// Rutas relacionadas con exámenes
 Route::resource('exams', ExamController::class)->middleware('auth');
 Route::get('/examenes', [ExamController::class, 'index'])->name('examenes');
 
-// Rutas relacionadas con calificaciones
-Route::post('grades/store', [GradeController::class, 'store'])->name('grades.store');
-Route::get('courses/{course}/cycles/{cycle}/grades', [GradeController::class, 'showAddGradesForm'])->name('grades.showAddForm');
-Route::post('courses/{course}/cycles/{cycle}/grades', [GradeController::class, 'store'])->name('grades.store');
-Route::get('/cursos/{course}/ciclos/{cycle}/calificaciones', [GradeController::class, 'showAddGradesForm'])->name('grades.showAddForm')->middleware('auth');
-Route::post('/calificaciones', [GradeController::class, 'store'])->name('grades.store');
-
-// Rutas relacionadas con autenticación y registro
 Route::get('/login', [SessionController::class, 'create'])->middleware('guest')->name('login.index');
 Route::post('/login', [SessionController::class, 'store'])->name('login.store');
 Route::get('/logout', [SessionController::class, 'destroy'])->middleware('auth')->name('login.destroy');
@@ -67,8 +47,31 @@ Route::get('/reset-password/{token}', [SessionController::class, 'showResetForm'
 Route::post('/reset-password', [SessionController::class, 'reset'])->name('password.update');
 Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register.index');
 Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
-
-// Otras rutas
 Route::get('/home', [SessionController::class, 'home'])->middleware('auth')->name('home');
+
 Route::post('/profile/upload', [SessionController::class, 'uploadProfileImage'])->name('profile.upload')->middleware('auth');
 Route::delete('/profile/delete', [SessionController::class, 'deleteProfileImage'])->name('profile.delete')->middleware('auth');
+
+Route::get('/estudiantes/download-template', [StudentController::class, 'downloadTemplate'])->name('students.downloadTemplate');
+Route::post('/estudiantes/upload-excel', [StudentController::class, 'uploadExcel'])->name('students.uploadExcel');
+
+Route::get('courses/{course}/cycles/{cycle}/daily-works', [DailyWorkController::class, 'getDailyWorks'])->name('dailyWorks.getDailyWorks');
+Route::post('grades/store', [GradeController::class, 'store'])->name('grades.store');
+
+
+Route::get('courses/{course}/cycles/{cycle}/grades', [GradeController::class, 'showAddGradesForm'])->name('grades.showAddForm');
+Route::post('courses/{course}/cycles/{cycle}/grades', [GradeController::class, 'store'])->name('grades.store');
+
+Route::get('/cursos/{course}/ciclos/{cycle}/calificaciones', [GradeController::class, 'showAddGradesForm'])->name('grades.showAddForm');
+Route::post('/calificaciones', [GradeController::class, 'store'])->name('grades.store');
+
+Route::get('/cursos/{course}/ciclos/{cycle}/calificaciones', [GradeController::class, 'showAddGradesForm'])->name('grades.showAddForm')->middleware('auth');
+Route::post('/courses/{course}/dailyWorks', [DailyWorkController::class, 'storeDailyWork'])->name('courses.dailyWorks.store');
+Route::get('/courses/{courseId}/allowedPercentage', [DailyWorkController::class, 'getAllowedPercentage']);
+
+Route::get('/dailyWorks/{courseId}/{cycle}', [DailyWorkController::class, 'getDailyWorksByCourseAndCycle']);
+Route::post('/grades', [GradeController::class, 'store'])->name('grades.store');
+Route::get('/students/{student}/dailyWorks', [StudentController::class, 'getDailyWorks']);
+
+Route::get('/students/create', [StudentController::class, 'create'])->name('students.create');
+Route::post('/students', [StudentController::class, 'store'])->name('students.store');

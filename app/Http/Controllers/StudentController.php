@@ -10,7 +10,6 @@ use App\Models\User;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\StudentsImport;
 use App\Exports\StudentsTemplateExport;
-use App\Models\Course;
 
 
 class StudentController extends Controller
@@ -39,26 +38,26 @@ class StudentController extends Controller
     }
     
 
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
+        // Validar los datos del formulario
         $request->validate([
             'name' => 'required|string|max:255',
             'grade' => 'required|string|max:255',
             'institution' => 'required|string|max:255',
             'section' => 'required|string|max:255',
-            'course_id' => 'nullable|exists:courses,id',
         ]);
 
+        // Crear un nuevo estudiante y asociarlo con el usuario autenticado
         $student = new Student();
-        $student->name = $request->name;
-        $student->grade = $request->grade;
-        $student->institution = $request->institution;
-        $student->section = $request->section;
-        $student->user_id = Auth::id(); // Asignar el usuario autenticado (docente)
-        $student->course_id = $request->course_id; // Puede ser nulo
+        $student->name = $request->input('name');
+        $student->grade = $request->input('grade');
+        $student->institution = $request->input('institution');
+        $student->section = $request->input('section');
+        $student->user_id = Auth::id(); // Asociar el estudiante con el usuario autenticado
         $student->save();
 
-        return redirect()->route('students.index')->with('success', 'Estudiante creado exitosamente.');
+        // Redirigir a la lista de estudiantes con un mensaje de éxito
+        return redirect()->route('students.index')->with('success', 'Estudiante agregado exitosamente');
     }
 
     public function update(Request $request, $id)
@@ -121,11 +120,5 @@ class StudentController extends Controller
     {
         $student = Student::findOrFail($id);
         return view('students.show', compact('student'));
-    }
-
-    public function create()
-    {
-        $courses = Course::all(); // Obtén todos los cursos
-        return view('estudiantes', compact('courses'));
     }
 }

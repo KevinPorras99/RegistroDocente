@@ -9,7 +9,6 @@ use App\Models\Grade;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
-use App\Models\Student;
 
 class DailyWorkController extends Controller
 {
@@ -91,12 +90,7 @@ class DailyWorkController extends Controller
 
         $dailyWork->save();
 
-        // Crear enlaces entre estudiantes y el nuevo trabajo cotidiano
-        $students = Student::where('course_id', $request->course_id)->get();
-        foreach ($students as $student) {
-            $student->dailyWorks()->attach($dailyWork->id);
-        }
-
+        
 
         return redirect()->route('dailyWorks.index')->with('success', 'Trabajo cotidiano agregado exitosamente.');
     }
