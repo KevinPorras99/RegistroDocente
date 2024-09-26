@@ -15,6 +15,13 @@
 
         <h1 class="mb-4">Añadir Calificaciones para el Curso: {{ $course->name }}</h1>
         <h2 class="mb-4">Ciclo: {{ $course->cycle_number }}</h2>
+
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
         <form action="{{ route('grades.store') }}" method="POST">
             @csrf
             <input type="hidden" name="course_id" value="{{ $course->id }}">

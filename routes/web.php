@@ -20,7 +20,6 @@ Route::get('/', function () {
 Route::resource('students', StudentController::class)->middleware('auth');
 Route::get('/estudiantes', [StudentController::class, 'index'])->name('estudiantes');
 
-
 Route::resource('courses', CourseController::class)->middleware('auth');
 Route::get('/cursos', [CourseController::class, 'index'])->name('cursos');
 Route::post('/cursos/assign-students', [CourseController::class, 'assignStudents'])->name('courses.assignStudents');
@@ -58,10 +57,10 @@ Route::post('/estudiantes/upload-excel', [StudentController::class, 'uploadExcel
 Route::get('courses/{course}/cycles/{cycle}/daily-works', [DailyWorkController::class, 'getDailyWorks'])->name('dailyWorks.getDailyWorks');
 Route::post('grades/store', [GradeController::class, 'store'])->name('grades.store');
 
-
 Route::get('courses/{course}/cycles/{cycle}/grades', [GradeController::class, 'showAddGradesForm'])->name('grades.showAddForm');
 Route::post('courses/{course}/cycles/{cycle}/grades', [GradeController::class, 'store'])->name('grades.store');
 
+// Rutas duplicadas comentadas
 Route::get('/cursos/{course}/ciclos/{cycle}/calificaciones', [GradeController::class, 'showAddGradesForm'])->name('grades.showAddForm');
 Route::post('/calificaciones', [GradeController::class, 'store'])->name('grades.store');
 
@@ -76,10 +75,8 @@ Route::get('/students/{student}/dailyWorks', [StudentController::class, 'getDail
 Route::get('/students/create', [StudentController::class, 'create'])->name('students.create');
 Route::post('/students', [StudentController::class, 'store'])->name('students.store');
 
-
 Route::middleware(['auth'])->group(function () {
     Route::get('/courses/{courseId}/grades/{cycle}', [DailyWorkController::class, 'showAddGradesForm'])->name('dailyWorks.showAddGradesForm');
     Route::post('/courses/{courseId}/grades', [DailyWorkController::class, 'storeGrades'])->name('dailyWorks.storeGrades');
     Route::post('/grades/store', [DailyWorkController::class, 'storeGrades'])->name('grades.store');
 });
-

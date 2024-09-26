@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Grade;
+use App\Models\DailyWorkGrade;
 use App\Models\DailyWork;
 use App\Models\Course;
 use Illuminate\Http\Request;
@@ -22,27 +22,28 @@ class GradeController extends Controller
             $dailyWork->grades = $dailyWork->grades()->pluck('grade', 'student_id')->toArray();
         }
 
-        // Verificar los datos
-        dd(compact('course', 'students', 'dailyWorks', 'cycle', 'user'));
-
         return view('add-grades', compact('course', 'students', 'dailyWorks', 'cycle', 'user'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'student_id' => 'required|exists:students,id',
             'grades' => 'required|array',
-            'grades.*' => 'required|numeric|min:0|max:100',
+            'grades.*.*' => 'required|numeric|min:0|max:100',
         ]);
 
-        foreach ($request->grades as $dailyWorkId => $score) {
-            Grade::create([
-                'student_id' => $request->student_id,
-                'subject' => DailyWork::find($dailyWorkId)->name,
-                'type' => 'Trabajo Cotidiano',
-                'score' => $score,
-            ]);
+        foreach ($request->grades as $studentId => $dailyWorkGrades) {
+            foreach ($dailyWorkGrades as $dailyWorkId => $grade) {
+                DailyWorkGrade::updateOrCreate(
+                    [
+                        'student_id' => $studentId,
+                        'daily_work_id' => $dailyWorkId,
+                    ],
+                    [
+                        'grade' => $grade,
+                    ]
+                );
+            }
         }
 
         return redirect()->back()->with('success', 'Calificaciones guardadas exitosamente.');
