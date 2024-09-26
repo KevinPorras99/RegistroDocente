@@ -23,7 +23,7 @@ class DailyWorkController extends Controller
         $search = $request->input('search');
         $courseId = $request->input('course');
         $cycle = $request->input('cycle');
-        $user = Auth::user();
+        $user = Auth::user();// Obtener el usuario autenticado
 
         $dailyWorks = DailyWork::with('course')
             ->whereHas('course', function ($query) use ($user) {
@@ -40,7 +40,7 @@ class DailyWorkController extends Controller
             ->when($cycle, function ($query, $cycle) {
                 return $query->where('cycle', $cycle);
             })
-            ->paginate(5);
+            ->paginate(5);// Paginación con 5 registros por página
 
         $courses = Course::all();
 
@@ -86,12 +86,13 @@ class DailyWorkController extends Controller
 
         if ($request->hasFile('file')) {
             $filePath = $request->file('file')->store('daily_works');
+            $path = $file->store('daily_works', 'public');
             $dailyWork->file_path = $filePath;
         }
 
         $dailyWork->save();
 
-        
+
 
         return redirect()->route('dailyWorks.index')->with('success', 'Trabajo cotidiano agregado exitosamente.');
     }

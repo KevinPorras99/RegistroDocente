@@ -121,10 +121,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="file">Archivo</label>
-                                <input type="file" class="form-control" id="add-file" name="file">
-                                @if ($errors->has('file'))
-                                    <span class="text-danger">{{ $errors->first('file') }}</span>
-                                @endif
+                                <input type="file" class="form-control" id="add-file" name="file" accept=".pdf,.txt,.doc,.docx">
                             </div>
                             <button type="submit" class="btn btn-primary">Agregar</button>
                         </form>
@@ -242,7 +239,7 @@
                                 <td>{{ $dailyWork->cycle }}</td>
                                 <td>
                                     @if($dailyWork->file_path)
-                                        <a href="{{ Storage::url($dailyWork->file_path) }}" target="_blank">Ver Archivo</a>
+                                    <a href="{{ asset('storage/' . $dailyWork->file_path) }}" target="_blank">Ver Archivo</a>
                                     @else
                                         No hay archivo
                                     @endif
