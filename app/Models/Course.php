@@ -25,4 +25,9 @@ class Course extends Model
     {
         return $this->hasMany(DailyWork::class);
     }
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
 }

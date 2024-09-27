@@ -30,6 +30,8 @@ Route::get('/cursos/{courseId}/student/{studentId}/courseworks', [DailyWorkContr
 
 Route::resource('tasks', TaskController::class)->middleware('auth');
 Route::get('/tareasyasignaciones', [TaskController::class, 'index'])->name('tareasyasignaciones');
+Route::get('tasks/{courseId}/{cycle}/add-grades', [TaskController::class, 'showAddGradesForm'])->name('add-grades');
+Route::post('tasks/{courseId}/store-grades', [TaskController::class, 'storeGrades'])->name('storeGrades');
 
 Route::resource('dailyWorks', DailyWorkController::class)->middleware('auth');
 Route::get('/trabajocotidiano', [DailyWorkController::class, 'index'])->name('trabajocotidiano');
@@ -80,3 +82,14 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/courses/{courseId}/grades', [DailyWorkController::class, 'storeGrades'])->name('dailyWorks.storeGrades');
     Route::post('/grades/store', [DailyWorkController::class, 'storeGrades'])->name('grades.store');
 });
+
+
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('tasks', TaskController::class);
+    Route::get('tasks/{courseId}/{cycle}/add-grades', [TaskController::class, 'showAddGradesForm'])->name('add-grades-tasks');
+    Route::post('tasks/{courseId}/store-grades', [TaskController::class, 'storeGrades'])->name('tasks.storeGrades');
+});
+
+

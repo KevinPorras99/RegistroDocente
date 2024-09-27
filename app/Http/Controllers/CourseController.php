@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Course;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 use App\Models\Student;
+use App\Models\Task;
+use App\Models\TaskGrade;
 
 class CourseController extends Controller
 {
@@ -24,10 +25,10 @@ class CourseController extends Controller
             ->when($search, function ($query, $search) {
                 return $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('grade', 'like', "%{$search}%")
-                    ->orWhere('institution', 'like', "%{$search}%")
-                    ->orWhere('classroom', 'like', "%{$search}%")
-                    ->orWhere('cycle', 'like', "%{$search}%");
+                        ->orWhere('grade', 'like', "%{$search}%")
+                        ->orWhere('institution', 'like', "%{$search}%")
+                        ->orWhere('classroom', 'like', "%{$search}%")
+                        ->orWhere('cycle', 'like', "%{$search}%");
                 });
             })
             ->paginate(5);
@@ -37,7 +38,8 @@ class CourseController extends Controller
         return view('cursos', compact('courses', 'user', 'students'));
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         // Validar los datos del formulario
         $request->validate([
             'name' => 'required|string|max:255',
@@ -124,12 +126,14 @@ class CourseController extends Controller
         return redirect()->route('courses.index')->with('success', 'Curso actualizado exitosamente');
     }
 
-    public function edit($id){
+    public function edit($id)
+    {
         $course = Course::findOrFail($id);
         return view('courses.edit', compact('course'));
     }
 
-    public function destroy($id) {
+    public function destroy($id)
+    {
         $course = Course::find($id);
         if ($course) {
             $course->delete();
@@ -177,5 +181,71 @@ class CourseController extends Controller
         $dailyTasks = $course->dailyTasks; // Asumiendo que tienes una relación dailyTasks en el modelo Course
 
         return view('cursos.show', compact('course', 'dailyTasks'));
+    }
+
+    // Nuevas funcionalidades para tareas y asignaciones
+    public function showTasks($courseId, $cycle)
+    {
+        $course = Course::findOrFail($courseId);
+        $tasks = $course->tasks()->where('cycle', $cycle)->get();
+        $students = $course->students;
+
+        return view('tasks.index', compact('course', 'tasks', 'students', 'cycle'));
+    }
+
+    public function storeTask(Request $request, $courseId)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'due_date' => 'required|date',
+            'cycle' => 'required|string',
+            'percentage' => 'required|integer|min:0|max:100',
+        ]);
+
+        $course = Course::findOrFail($courseId);
+        $totalPercentage = $course->tasks()->where('cycle', $request->cycle)->sum('percentage');
+        $allowedPercentage = $course->assignment_percentage - $totalPercentage;
+
+        if ($request->percentage > $allowedPercentage) {
+            return back()->withErrors(['percentage' => 'El porcentaje excede el permitido.']);
+        }
+
+        $task = new Task();
+        $task->name = $request->name;
+        $task->description = $request->description;
+        $task->due_date = $request->due_date;
+        $task->course_id = $courseId;
+        $task->cycle = $request->cycle;
+        $task->percentage = $request->percentage;
+        $task->save();
+
+        return redirect()->route('courses.showTasks', ['courseId' => $courseId, 'cycle' => $request->cycle])->with('success', 'Tarea agregada exitosamente.');
+    }
+
+    public function showAddGradesForm($courseId, $cycle)
+    {
+        $course = Course::findOrFail($courseId);
+        $tasks = $course->tasks()->where('cycle', $cycle)->get();
+        $students = $course->students;
+
+        return view('add-grades', compact('course', 'tasks', 'students', 'cycle'));
+    }
+
+    public function storeGrades(Request $request, $courseId)
+    {
+        $course = Course::findOrFail($courseId);
+        $tasks = $course->tasks()->where('cycle', $request->cycle)->get();
+
+        foreach ($request->grades as $studentId => $grades) {
+            foreach ($grades as $taskId => $grade) {
+                TaskGrade::updateOrCreate(
+                    ['task_id' => $taskId, 'student_id' => $studentId],
+                    ['grade' => $grade]
+                );
+            }
+        }
+
+        return redirect()->route('courses.showTasks', ['courseId' => $courseId, 'cycle' => $request->cycle])->with('success', 'Calificaciones guardadas exitosamente.');
     }
 }

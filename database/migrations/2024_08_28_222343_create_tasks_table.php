@@ -6,28 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateTasksTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->text('description');
+            $table->string('description');
             $table->date('due_date');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('course_id');
+            $table->string('cycle');
+            $table->integer('percentage')->default(0);
             $table->timestamps();
+
+            $table->foreign('course_id')->references('id')->on('courses')->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('tasks');
