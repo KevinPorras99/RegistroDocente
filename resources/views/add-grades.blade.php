@@ -2,8 +2,6 @@
 
 @section('title', 'Añadir Calificaciones')
 
-
-
 @section('content')
     <div class="container pt-5">
         <!-- Botón de flecha hacia la izquierda solo con el icono en la esquina superior izquierda -->

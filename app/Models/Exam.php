@@ -1,5 +1,4 @@
 <?php
-// app/Models/Exam.php
 
 namespace App\Models;
 
@@ -10,5 +9,22 @@ class Exam extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'due_date'];
+    protected $fillable = [
+        'name',
+        'description',
+        'due_date',
+        'course_id',
+        'cycle',
+        'percentage',
+    ];
+
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
+    }
+
+    public function grades()
+    {
+        return $this->hasMany(ExamGrade::class);
+    }
 }

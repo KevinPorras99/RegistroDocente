@@ -30,4 +30,8 @@ class Course extends Model
     {
         return $this->hasMany(Task::class);
     }
+    public function exams()
+    {
+        return $this->hasMany(Exam::class);
+    }
 }

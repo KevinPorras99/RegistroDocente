@@ -9,7 +9,6 @@
 @section('content')
     <div class="content">
         <h1><i class="fas fa-book"></i> Cursos</h1>
-        <p>Selecciona alguna palabra clave para poner en la barra de búsqueda y presiona Enter</p>
 
         <!-- Mostrar mensaje de éxito -->
         @if(session('success'))
@@ -30,7 +29,7 @@
             </button>
         </div>
 
-       
+
         <!-- Modal de Agregar Curso -->
         <div class="modal fade" id="addCourseModal" tabindex="-1" role="dialog" aria-labelledby="addCourseModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
@@ -243,7 +242,7 @@
                         <form id="assignStudentsForm" action="{{ route('courses.assignStudents') }}" method="POST">
                             @csrf
                             <input type="hidden" name="course_id" id="course_id" value="">
-                
+
                             @if($students->isEmpty())
                                 <p>Primero debes de registrar estudiantes en la sección "Estudiantes".</p>
                             @else

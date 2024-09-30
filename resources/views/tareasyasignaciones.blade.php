@@ -41,8 +41,6 @@
             </form>
         </div>
 
-        <p>Selecciona alguna palabra clave para poner en la barra de búsqueda y presiona Enter</p>
-
         <!-- Barra de búsqueda y botón para agregar tarea -->
         <div class="d-flex flex-wrap mb-3">
             <form action="{{ route('tasks.index') }}" method="GET" class="mr-2 flex-grow-1 d-flex">

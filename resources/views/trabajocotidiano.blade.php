@@ -41,8 +41,6 @@
             </form>
         </div>
 
-        <p>Selecciona alguna palabra clave para poner en la barra de búsqueda y presiona Enter</p>
-
         <!-- Barra de búsqueda y botón para agregar trabajo cotidiano -->
         <div class="d-flex flex-wrap mb-3">
             <form action="{{ route('dailyWorks.index') }}" method="GET" class="mr-2 flex-grow-1 d-flex">
@@ -288,15 +286,16 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
+    // Función para abrir el modal de añadir trabajo cotidiano
     function openAddDailyWorkModal() {
         document.getElementById('addDailyWorkModal').style.display = 'block';
         updateAddCycleOptions(); // Actualizar las opciones de ciclo cuando se abre el modal
     }
-
+// Función para cerrar el modal de añadir trabajo cotidiano
     function closeAddDailyWorkModal() {
         document.getElementById('addDailyWorkModal').style.display = 'none';
     }
-
+// Función para abrir el modal de visualización de trabajo cotidiano
     function openViewDailyWorkModal(dailyWork) {
         document.getElementById('viewName').innerText = dailyWork.name;
         document.getElementById('viewDescription').innerText = dailyWork.description;
@@ -306,11 +305,11 @@
         document.getElementById('viewInstitution').innerText = dailyWork.course.institution; // Mostrar institución
         document.getElementById('viewDailyWorkModal').style.display = 'block';
     }
-
+// Función para cerrar el modal de visualización de trabajo cotidiano
     function closeViewDailyWorkModal() {
         document.getElementById('viewDailyWorkModal').style.display = 'none';
     }
-
+// Función para abrir el modal de edición de trabajo cotidiano
     function openEditDailyWorkModal(dailyWork) {
         var formAction = `{{ route('dailyWorks.update', ':id') }}`;
         formAction = formAction.replace(':id', dailyWork.id);
@@ -363,7 +362,7 @@
             });
         }
     }
-
+// Función para actualizar las opciones de ciclo en el dropdown de filtros
     function updateCycleOptions() {
         const courseSelect = document.getElementById('courseSelect');
         const selectedCourse = courseSelect.options[courseSelect.selectedIndex];

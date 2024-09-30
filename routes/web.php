@@ -10,16 +10,17 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\DailyWorkController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\ExamGradeController;
 use App\Http\Controllers\GradeController;
 
 // Vista por defecto redirigida a login
 Route::get('/', function () {
     return redirect()->route('login.index');
 })->middleware('guest');
-
+//estudiantes
 Route::resource('students', StudentController::class)->middleware('auth');
 Route::get('/estudiantes', [StudentController::class, 'index'])->name('estudiantes');
-
+//cursos
 Route::resource('courses', CourseController::class)->middleware('auth');
 Route::get('/cursos', [CourseController::class, 'index'])->name('cursos');
 Route::post('/cursos/assign-students', [CourseController::class, 'assignStudents'])->name('courses.assignStudents');
@@ -27,7 +28,7 @@ Route::get('/cursos/{courseId}', [CourseController::class, 'show'])->name('cours
 Route::get('/cursos/{id}/detalles', [CourseController::class, 'showDailyTask'])->name('courses.showDailyTask');
 
 Route::get('/cursos/{courseId}/student/{studentId}/courseworks', [DailyWorkController::class, 'getCourseWorks']);
-
+//cotidiano
 Route::resource('tasks', TaskController::class)->middleware('auth');
 Route::get('/tareasyasignaciones', [TaskController::class, 'index'])->name('tareasyasignaciones');
 Route::get('tasks/{courseId}/{cycle}/add-grades', [TaskController::class, 'showAddGradesForm'])->name('add-grades');
@@ -35,10 +36,13 @@ Route::post('tasks/{courseId}/store-grades', [TaskController::class, 'storeGrade
 
 Route::resource('dailyWorks', DailyWorkController::class)->middleware('auth');
 Route::get('/trabajocotidiano', [DailyWorkController::class, 'index'])->name('trabajocotidiano');
-
+//examenes
 Route::resource('exams', ExamController::class)->middleware('auth');
 Route::get('/examenes', [ExamController::class, 'index'])->name('examenes');
+Route::get('exams/{courseId}/{cycle}/add-grades', [ExamGradeController::class, 'showAddGradesForm'])->name('add-grades-exams');
+Route::post('exams/{courseId}/store-grades', [ExamGradeController::class, 'storeGrades'])->name('exams.storeGrades');
 
+//login
 Route::get('/login', [SessionController::class, 'create'])->middleware('guest')->name('login.index');
 Route::post('/login', [SessionController::class, 'store'])->name('login.store');
 Route::get('/logout', [SessionController::class, 'destroy'])->middleware('auth')->name('login.destroy');
@@ -62,7 +66,7 @@ Route::post('grades/store', [GradeController::class, 'store'])->name('grades.sto
 Route::get('courses/{course}/cycles/{cycle}/grades', [GradeController::class, 'showAddGradesForm'])->name('grades.showAddForm');
 Route::post('courses/{course}/cycles/{cycle}/grades', [GradeController::class, 'store'])->name('grades.store');
 
-// Rutas duplicadas comentadas
+// Rutas duplicadas comentadas(se necesitan)
 Route::get('/cursos/{course}/ciclos/{cycle}/calificaciones', [GradeController::class, 'showAddGradesForm'])->name('grades.showAddForm');
 Route::post('/calificaciones', [GradeController::class, 'store'])->name('grades.store');
 
@@ -78,18 +82,14 @@ Route::get('/students/create', [StudentController::class, 'create'])->name('stud
 Route::post('/students', [StudentController::class, 'store'])->name('students.store');
 
 Route::middleware(['auth'])->group(function () {
+    // Rutas de tareas
     Route::get('/courses/{courseId}/grades/{cycle}', [DailyWorkController::class, 'showAddGradesForm'])->name('dailyWorks.showAddGradesForm');
     Route::post('/courses/{courseId}/grades', [DailyWorkController::class, 'storeGrades'])->name('dailyWorks.storeGrades');
     Route::post('/grades/store', [DailyWorkController::class, 'storeGrades'])->name('grades.store');
 });
-
-
-
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('tasks', TaskController::class);
     Route::get('tasks/{courseId}/{cycle}/add-grades', [TaskController::class, 'showAddGradesForm'])->name('add-grades-tasks');
     Route::post('tasks/{courseId}/store-grades', [TaskController::class, 'storeGrades'])->name('tasks.storeGrades');
 });
-
-

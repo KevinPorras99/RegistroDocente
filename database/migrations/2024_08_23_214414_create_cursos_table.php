@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
+//tabla de cursos
 class CreateCursosTable extends Migration
 {
     public function up() {
@@ -13,6 +13,8 @@ class CreateCursosTable extends Migration
             $table->string('grade');
             $table->string('institution');
             $table->string('classroom');
+            $table->string('cycle'); // Añadir la columna cycle
+            $table->string('cycle_number'); // Añadir la columna cycle_number
             $table->unsignedBigInteger('user_id')->nullable(); // Permitir valores nulos
             $table->integer('daily_work_percentage')->nullable();
             $table->integer('exam_percentage')->nullable();
