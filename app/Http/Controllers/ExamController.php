@@ -31,8 +31,8 @@ class ExamController extends Controller
             })
             ->when($search, function ($query, $search) {
                 return $query->where('name', 'like', "%{$search}%")
-                             ->orWhere('description', 'like', "%{$search}%")
-                             ->orWhere('due_date', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('due_date', 'like', "%{$search}%");
             })
             ->when($courseId, function ($query, $courseId) {
                 return $query->where('course_id', $courseId);

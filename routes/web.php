@@ -12,6 +12,7 @@ use App\Http\Controllers\DailyWorkController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\ExamGradeController;
 use App\Http\Controllers\GradeController;
+use App\Http\Controllers\TaskGradeController;
 
 // Vista por defecto redirigida a login
 Route::get('/', function () {
@@ -28,7 +29,7 @@ Route::get('/cursos/{courseId}', [CourseController::class, 'show'])->name('cours
 Route::get('/cursos/{id}/detalles', [CourseController::class, 'showDailyTask'])->name('courses.showDailyTask');
 
 Route::get('/cursos/{courseId}/student/{studentId}/courseworks', [DailyWorkController::class, 'getCourseWorks']);
-//cotidiano
+//tareas
 Route::resource('tasks', TaskController::class)->middleware('auth');
 Route::get('/tareasyasignaciones', [TaskController::class, 'index'])->name('tareasyasignaciones');
 Route::get('tasks/{courseId}/{cycle}/add-grades', [TaskController::class, 'showAddGradesForm'])->name('add-grades');
@@ -82,7 +83,7 @@ Route::get('/students/create', [StudentController::class, 'create'])->name('stud
 Route::post('/students', [StudentController::class, 'store'])->name('students.store');
 
 Route::middleware(['auth'])->group(function () {
-    // Rutas de tareas
+    // Rutas de cotidiano
     Route::get('/courses/{courseId}/grades/{cycle}', [DailyWorkController::class, 'showAddGradesForm'])->name('dailyWorks.showAddGradesForm');
     Route::post('/courses/{courseId}/grades', [DailyWorkController::class, 'storeGrades'])->name('dailyWorks.storeGrades');
     Route::post('/grades/store', [DailyWorkController::class, 'storeGrades'])->name('grades.store');
@@ -90,6 +91,6 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('tasks', TaskController::class);
-    Route::get('tasks/{courseId}/{cycle}/add-grades', [TaskController::class, 'showAddGradesForm'])->name('add-grades-tasks');
-    Route::post('tasks/{courseId}/store-grades', [TaskController::class, 'storeGrades'])->name('tasks.storeGrades');
+    Route::get('tasks/{courseId}/{cycle}/add-grades', [TaskGradeController::class, 'showAddGradesForm'])->name('add-grades-tasks');
+    Route::post('tasks/{courseId}/store-grades', [TaskGradeController::class, 'storeGrades'])->name('tasks.storeGrades');
 });

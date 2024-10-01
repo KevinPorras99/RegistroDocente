@@ -30,8 +30,8 @@ class TaskController extends Controller
             })
             ->when($search, function ($query, $search) {
                 return $query->where('name', 'like', "%{$search}%")
-                             ->orWhere('description', 'like', "%{$search}%")
-                             ->orWhere('due_date', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('due_date', 'like', "%{$search}%");
             })
             ->when($courseId, function ($query, $courseId) {
                 return $query->where('course_id', $courseId);
@@ -85,6 +85,7 @@ class TaskController extends Controller
 
         if ($request->hasFile('file')) {
             $filePath = $request->file('file')->store('tasks');
+            $path = $file->store('tasks', 'public');
             $task->file_path = $filePath;
         }
 
@@ -164,26 +165,6 @@ class TaskController extends Controller
         }
 
         return view('add-grades-tasks', compact('course', 'students', 'tasks', 'cycle', 'user'));
-    }
-
-    public function storeGrades(Request $request, $courseId)
-    {
-        $request->validate([
-            'grades' => 'required|array',
-            'grades.*.*' => 'nullable|integer|min:0|max:100',
-        ]);
-
-
-        foreach ($request->grades as $studentId => $tasks) {
-            foreach ($tasks as $taskId => $grade) {
-                TaskGrade::updateOrCreate(
-                    ['task_id' => $taskId, 'student_id' => $studentId],
-                    ['grade' => $grade]
-                );
-            }
-        }
-
-        return redirect()->route('courses.show', $courseId)->with('success', 'Calificaciones actualizadas exitosamente.');
     }
 
     public function getTasks($courseId, $cycle)

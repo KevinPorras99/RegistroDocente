@@ -39,7 +39,7 @@
                                 <td>{{ $student->name }}</td>
                                 @foreach ($tasks as $task)
                                     <td>
-                                        <input type="number" class="form-control" name="grades[{{ $student->id }}][{{ $task->id }}]" value="{{ old('grades.' . $student->id . '.' . $task->id) }}" min="0" max="100">
+                                        <input type="number" class="form-control" name="grades[{{ $student->id }}][{{ $task->id }}]" value="{{ old('grades.' . $student->id . '.' . $task->id, $task->grades[$student->id] ?? '') }}" min="0" max="100">
                                     </td>
                                 @endforeach
                             </tr>
