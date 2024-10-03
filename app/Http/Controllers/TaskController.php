@@ -63,7 +63,7 @@ class TaskController extends Controller
             'course_id' => 'required|integer',
             'cycle' => 'required|string',
             'percentage' => 'required|integer|min:0',
-            'file' => 'nullable|file|mimes:pdf,txt,doc,docx',
+            'file' => 'nullable|file|mimes:pdf,txt,doc,docx|max:2048',
         ]);
 
         $course = Course::findOrFail($request->course_id);
@@ -74,7 +74,6 @@ class TaskController extends Controller
             return back()->withErrors(['percentage' => 'El porcentaje no puede exceder el porcentaje permitido para el curso.'])->withInput();
         }
 
-        // Crear la nueva tarea
         $task = new Task();
         $task->name = $request->name;
         $task->description = $request->description;
@@ -84,8 +83,8 @@ class TaskController extends Controller
         $task->percentage = $request->percentage;
 
         if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('tasks');
-            $path = $file->store('tasks', 'public');
+            $file = $request->file('file');
+            $filePath = $file->store('tasks', 'public');
             $task->file_path = $filePath;
         }
 
@@ -93,6 +92,7 @@ class TaskController extends Controller
 
         return redirect()->route('tasks.index')->with('success', 'Tarea agregada exitosamente.');
     }
+
 
     public function update(Request $request, $id)
     {
@@ -128,7 +128,7 @@ class TaskController extends Controller
                 Storage::disk('public')->delete($task->file_path);
             }
 
-            $file = $request->file('file');
+            $file = $request->file('file'); // Definir la variable $file
             $path = $file->store('tasks', 'public');
             $task->file_path = $path;
         }
@@ -153,19 +153,7 @@ class TaskController extends Controller
         return redirect()->route('tasks.index');
     }
 
-    public function showAddGradesForm($courseId, $cycle)
-    {
-        $course = Course::findOrFail($courseId);
-        $students = $course->students;
-        $tasks = Task::where('course_id', $courseId)->where('cycle', $cycle)->get();
-        $user = auth()->user();
-
-        foreach ($tasks as $task) {
-            $task->grades = $task->grades()->pluck('grade', 'student_id')->toArray();
-        }
-
-        return view('add-grades-tasks', compact('course', 'students', 'tasks', 'cycle', 'user'));
-    }
+    
 
     public function getTasks($courseId, $cycle)
     {

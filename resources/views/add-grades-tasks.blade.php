@@ -10,16 +10,26 @@
                 <i class="fas fa-arrow-left"></i>
             </a>
         </div>
-
+        
         <h1 class="mb-4">Añadir Calificaciones para el Curso: {{ $course->name }}</h1>
         <h2 class="mb-4">Ciclo: {{ $cycle }}</h2>
-
+        
         @if (session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}
             </div>
         @endif
-
+        
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        
         <form action="{{ route('tasks.storeGrades', ['courseId' => $course->id]) }}" method="POST">
             @csrf
             <input type="hidden" name="cycle" value="{{ $cycle }}">

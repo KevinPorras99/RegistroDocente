@@ -32,8 +32,14 @@ class TaskGradeController extends Controller
             'grades.*.*' => 'required|numeric|min:0|max:100',
         ]);
 
-        foreach ($request->grades as $taskId => $students) {
-            foreach ($students as $studentId => $grade) {
+        foreach ($request->grades as $studentId => $tasks) {
+            foreach ($tasks as $taskId => $grade) {
+                // Verificar que el task_id exista en la tabla tasks
+                if (!Task::where('id', $taskId)->exists()) {
+                    // Omitir esta tarea y continuar con las demás
+                    continue;
+                }
+
                 TaskGrade::updateOrCreate(
                     [
                         'student_id' => $studentId,

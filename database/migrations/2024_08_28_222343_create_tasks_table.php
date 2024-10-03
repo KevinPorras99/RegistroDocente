@@ -15,6 +15,7 @@ class CreateTasksTable extends Migration
             $table->date('due_date');
             $table->unsignedBigInteger('course_id');
             $table->string('cycle');
+            $table->string('file_path')->nullable(); // Añadir la columna file_path
             $table->integer('percentage')->default(0);
             $table->timestamps();
 

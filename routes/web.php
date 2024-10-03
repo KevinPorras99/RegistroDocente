@@ -94,3 +94,4 @@ Route::middleware(['auth'])->group(function () {
     Route::get('tasks/{courseId}/{cycle}/add-grades', [TaskGradeController::class, 'showAddGradesForm'])->name('add-grades-tasks');
     Route::post('tasks/{courseId}/store-grades', [TaskGradeController::class, 'storeGrades'])->name('tasks.storeGrades');
 });
+
