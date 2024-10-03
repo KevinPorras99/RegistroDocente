@@ -13,6 +13,7 @@ use App\Http\Controllers\ExamController;
 use App\Http\Controllers\ExamGradeController;
 use App\Http\Controllers\GradeController;
 use App\Http\Controllers\TaskGradeController;
+use App\Http\Controllers\AssistanceController;
 
 // Vista por defecto redirigida a login
 Route::get('/', function () {
@@ -95,3 +96,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('tasks/{courseId}/store-grades', [TaskGradeController::class, 'storeGrades'])->name('tasks.storeGrades');
 });
 
+Route::get('/asistencia', [AssistanceController::class, 'index'])->name('asistencia');
+
+Route::post('/asistencia/store', [AssistanceController::class, 'store'])->name('asistencia.store');
+Route::get('/asistencia/show', [AssistanceController::class, 'showAssistance'])->name('asistencia.show');

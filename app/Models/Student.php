@@ -27,4 +27,9 @@ class Student extends Model
     {
         return $this->hasMany(Grade::class);
     }
+
+    public function assistances()
+    {
+        return $this->hasMany(Assistance::class);
+    }
 }

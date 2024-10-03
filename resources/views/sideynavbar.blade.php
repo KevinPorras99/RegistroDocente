@@ -25,7 +25,7 @@
             <a href="{{ route('examenes') }}"><i class="fas fa-file-alt"></i> <span> Pruebas o Exámenes</span></a>
             <a href="{{ route('tareasyasignaciones') }}"><i class="fas fa-tasks"></i> <span> Tareas o Asignaciones</span></a>
             <a href="#conducta-desempeno"><i class="fas fa-user-check"></i> <span> Conducta y Desempeño</span></a>
-            <a href="#asistencia"><i class="fas fa-calendar-check"></i> <span> Asistencia</span></a>
+            <a href="{{ route('asistencia') }}"><i class="fas fa-calendar-check"></i> <span> Asistencia</span></a>
             <a href="#calificaciones"><i class="fas fa-chart-line"></i> <span> Calificaciones</span></a>
         </div>
         <button class="toggle-btn" onclick="toggleSidebar()">
