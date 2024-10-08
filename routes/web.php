@@ -100,3 +100,7 @@ Route::get('/asistencia', [AssistanceController::class, 'index'])->name('asisten
 
 Route::post('/asistencia/store', [AssistanceController::class, 'store'])->name('asistencia.store');
 Route::get('/asistencia/show', [AssistanceController::class, 'showAssistance'])->name('asistencia.show');
+
+Route::post('/justifications/store', [AssistanceController::class, 'storeJustifications'])->name('justifications.store');
+Route::get('/justifications', [AssistanceController::class, 'showJustifications'])->name('justifications.show');
+Route::delete('/justifications/file/{id}', [AssistanceController::class, 'deleteJustificationFile'])->name('justifications.deleteFile');

@@ -20,4 +20,9 @@ class Assistance extends Model
     {
         return $this->belongsTo(Course::class);
     }
+    
+    public function justifications()
+    {
+        return $this->hasMany(Justification::class);
+    }
 }

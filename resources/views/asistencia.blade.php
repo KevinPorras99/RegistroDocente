@@ -4,15 +4,64 @@
 
 @section('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/home.styles.css') }}">
+    <style>
+        .attendance-marked {
+            position: relative;
+        }
+        .attendance-marked.present::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background-color: green;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .attendance-marked.late::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background-color: yellow;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .attendance-marked.absent::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .calendar-day-marked {
+            position: relative;
+        }
+        .calendar-day-marked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            border: 2px solid blue;
+            border-radius: 50%;
+            background-color: transparent;
+            transform: translate(-50%, -50%);
+        }
+    </style>
 @endsection
 
 @section('content')
     <div class="content">
-        @if (session('success'))
-            <div class="alert alert-success" id="success-message">
-                {{ session('success') }}
-            </div>
-        @endif
+        
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h1 class="mb-0"><i class="fas fa-calendar-check"></i> Asistencia</h1>
@@ -50,13 +99,17 @@
             </form>
         </div>
 
-
         <!-- Mostrar mensaje si no se han seleccionado todos los filtros -->
         @if (!request('course') || !request('start_date') || !request('end_date'))
             <div class="alert alert-warning">
                 Por favor, seleccione un curso y un rango de fechas para ver la lista de estudiantes.
             </div>
         @else
+        @if (session('success'))
+            <div class="alert alert-success" id="success-message">
+                {{ session('success') }}
+            </div>
+        @endif
             <!-- Lista de estudiantes en formato de calendario -->
             <form action="{{ route('asistencia.store') }}" method="POST">
                 @csrf
@@ -78,10 +131,20 @@
                                 <tr>
                                     <td>{{ $student->name }}</td>
                                     @foreach ($dates as $date)
-                                        <td>
-                                            @php
-                                                $attendance = $student->assistances->firstWhere('date', $date->format('Y-m-d'));
-                                            @endphp
+                                        @php
+                                            $attendance = $student->assistances->firstWhere('date', $date->format('Y-m-d'));
+                                            $markedClass = '';
+                                            if ($attendance) {
+                                                if ($attendance->status == 'present') {
+                                                    $markedClass = 'attendance-marked present';
+                                                } elseif ($attendance->status == 'late') {
+                                                    $markedClass = 'attendance-marked late';
+                                                } elseif ($attendance->status == 'absent') {
+                                                    $markedClass = 'attendance-marked absent';
+                                                }
+                                            }
+                                        @endphp
+                                        <td class="{{ $markedClass }}">
                                             <select name="attendance[{{ $student->id }}][{{ $date->format('Y-m-d') }}]" class="form-control">
                                                 <option value="">Sin asignar</option>
                                                 <option value="present" {{ $attendance && $attendance->status == 'present' ? 'selected' : '' }}>Presente</option>
@@ -102,6 +165,59 @@
                     <button type="submit" class="btn btn-success">Guardar Asistencia</button>
                 </div>
             </form>
+
+            <!-- Lista de justificaciones -->
+            <div class="container mt-5">
+                <h2>Justificaciones de Ausencias y Tardías</h2>
+                <form action="{{ route('justifications.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Nombre del Estudiante</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                    <th>Justificante</th>
+                                    <th>Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($justifications as $justification)
+                                    <tr>
+                                        <td>{{ $justification->student->name }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($justification->date)->format('d-m-Y') }}</td>
+                                        <td>
+                                            @php
+                                                $statusTranslations = [
+                                                    'late' => 'Tardía',
+                                                    'absent' => 'Ausente'
+                                                ];
+                                            @endphp
+                                            {{ $statusTranslations[$justification->status] ?? ucfirst($justification->status) }}
+                                        </td>
+                                        <td>
+                                            @php
+                                                $existingJustification = $justification->justifications->first();
+                                            @endphp
+                                            @if ($existingJustification && $existingJustification->file_path)
+                                                <a href="{{ asset('storage/' . $existingJustification->file_path) }}" target="_blank">Ver archivo</a>
+                                            @endif
+                                            <input type="file" name="justifications[{{ $justification->id }}][file]" class="form-control">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="justifications[{{ $justification->id }}][observations]" class="form-control" value="{{ $existingJustification ? $existingJustification->observations : '' }}">
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-primary">Guardar Justificaciones</button>
+                    </div>
+                </form>
+            </div>
 
             <!-- Enlaces de paginación -->
             <div class="d-flex justify-content-center">
