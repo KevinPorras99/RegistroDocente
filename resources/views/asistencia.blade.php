@@ -67,14 +67,11 @@
             <h1 class="mb-0"><i class="fas fa-calendar-check"></i> Asistencia</h1>
             <form id="filterForm" action="{{ route('asistencia.show') }}" method="GET" class="d-inline-block">
                 <h2><i class="fas fa-filter"></i> Filtros</h2>
-                <select id="courseSelect" name="course" class="form-control d-inline-block" style="width: 300px;"
-                    onchange="this.form.submit();">
+                <select id="courseSelect" name="course" class="form-control d-inline-block" style="width: 300px;">
                     <option value="">Seleccione un curso</option>
                     @foreach ($courses as $course)
-                        <option value="{{ $course->id }}"
-                            {{ request('course') == $course->id ? 'selected' : '' }}>
-                            {{ $course->name }} - {{ $course->grade }} - {{ $course->institution }} -
-                            {{ $course->classroom }}
+                        <option value="{{ $course->id }}" {{ request('course') == $course->id ? 'selected' : '' }}>
+                            {{ $course->name }} - {{ $course->grade }} - {{ $course->institution }} - {{ $course->classroom }}
                         </option>
                     @endforeach
                 </select>
@@ -180,6 +177,8 @@
                                     <th>Estado</th>
                                     <th>Justificante</th>
                                     <th>Observaciones</th>
+                                    <th>Justificación</th>
+                                    <th>Porcentaje de Asistencia total del estudiante</th> <!-- Nueva columna -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -208,6 +207,50 @@
                                         <td>
                                             <input type="text" name="justifications[{{ $justification->id }}][observations]" class="form-control" value="{{ $existingJustification ? $existingJustification->observations : '' }}">
                                         </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <select name="justifications[{{ $justification->id }}][justification_status]" class="form-control mr-2">
+                                                    <option value="justified" {{ $existingJustification && $existingJustification->justification_status == 'justified' ? 'selected' : '' }}>Justificado</option>
+                                                    <option value="not_justified" {{ $existingJustification && $existingJustification->justification_status == 'not_justified' ? 'selected' : '' }}>Sin justificar</option>
+                                                </select>
+                                                @if ($existingJustification && $existingJustification->justification_status == 'justified')
+                                                    <i class="fas fa-check-circle text-success"></i>
+                                                @else
+                                                    <i class="fas fa-times-circle text-danger"></i>
+                                                @endif
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @php
+                                                $course = $justification->course;
+                                                if ($course) {
+                                                    $totalAssistances = $justification->student->assistances->where('course_id', $course->id)->count();
+                                                    $absences = $justification->student->assistances->where('course_id', $course->id)->where('status', 'absent')->count();
+                                                    $lates = $justification->student->assistances->where('course_id', $course->id)->where('status', 'late')->count();
+
+                                                    // Ajustar los valores si están justificados
+                                                    foreach ($justification->student->assistances->where('course_id', $course->id) as $assistance) {
+                                                        $justification = $assistance->justifications->first();
+                                                        if ($justification && $justification->justification_status == 'justified') {
+                                                            if ($assistance->status == 'absent') {
+                                                                $absences--;
+                                                            } elseif ($assistance->status == 'late') {
+                                                                $lates--;
+                                                            }
+                                                        }
+                                                    }
+
+                                                    $attendancePercentage = $course->attendance_percentage;
+                                                    $deductionPerAbsence = $attendancePercentage / $totalAssistances;
+                                                    $deductionPerLate = $deductionPerAbsence / 2;
+
+                                                    $finalAttendancePercentage = $attendancePercentage - ($absences * $deductionPerAbsence) - ($lates * $deductionPerLate);
+                                                } else {
+                                                    $finalAttendancePercentage = 'N/A';
+                                                }
+                                            @endphp
+                                            {{ $finalAttendancePercentage }}%
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -223,8 +266,8 @@
             <div class="d-flex justify-content-center">
                 {{ $students->links('pagination::bootstrap-4') }}
             </div>
-        @endif
-    </div>
+            @endif
+            </div>
 @endsection
 
 @section('scripts')

@@ -118,6 +118,7 @@ class AssistanceController extends Controller
             'justifications' => 'required|array',
             'justifications.*.file' => 'nullable|file|mimes:pdf,jpg,jpeg,png',
             'justifications.*.observations' => 'nullable|string|max:255',
+            'justifications.*.justification_status' => 'required|string|in:justified,not_justified',
         ]);
 
         foreach ($data['justifications'] as $id => $justification) {
@@ -127,6 +128,7 @@ class AssistanceController extends Controller
                 $justificationData = [
                     'assistance_id' => $assistance->id,
                     'observations' => $justification['observations'] ?? null,
+                    'justification_status' => $justification['justification_status'],
                 ];
 
                 if (isset($justification['file'])) {
@@ -138,6 +140,25 @@ class AssistanceController extends Controller
                     ['assistance_id' => $assistance->id],
                     $justificationData
                 );
+            }
+        }
+
+        // Calcular el porcentaje de asistencia para cada estudiante
+        $students = Student::with(['assistances.course'])->get();
+
+        foreach ($students as $student) {
+            foreach ($student->courses as $course) {
+                $totalAssistances = $student->assistances->where('course_id', $course->id)->count();
+                $absences = $student->assistances->where('course_id', $course->id)->where('status', 'absent')->count();
+                $lates = $student->assistances->where('course_id', $course->id)->where('status', 'late')->count();
+
+                $attendancePercentage = $course->attendance_percentage;
+                $deductionPerAbsence = $attendancePercentage / $totalAssistances;
+                $deductionPerLate = $deductionPerAbsence / 2;
+
+                $finalAttendancePercentage = $attendancePercentage - ($absences * $deductionPerAbsence) - ($lates * $deductionPerLate);
+
+                $student->courses->find($course->id)->final_attendance_percentage = $finalAttendancePercentage;
             }
         }
 
@@ -190,7 +211,7 @@ class AssistanceController extends Controller
             ->with(['student', 'justifications']) // Asegúrate de cargar la relación con el estudiante y las justificaciones
             ->get();
 
-        return view('justificaciones', compact('courses', 'students', 'dates', 'attendanceDates', 'justifications'));
+        return view('asistencia', compact('courses', 'students', 'dates', 'attendanceDates', 'justifications'));
     }
 
     public function deleteJustificationFile($id)
