@@ -14,6 +14,7 @@ use App\Http\Controllers\ExamGradeController;
 use App\Http\Controllers\GradeController;
 use App\Http\Controllers\TaskGradeController;
 use App\Http\Controllers\AssistanceController;
+use App\Http\Controllers\ConductController;
 
 // Vista por defecto redirigida a login
 Route::get('/', function () {
@@ -96,6 +97,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('tasks/{courseId}/store-grades', [TaskGradeController::class, 'storeGrades'])->name('tasks.storeGrades');
 });
 
+//asistencia
 Route::get('/asistencia', [AssistanceController::class, 'index'])->name('asistencia');
 
 Route::post('/asistencia/store', [AssistanceController::class, 'store'])->name('asistencia.store');
@@ -104,3 +106,14 @@ Route::get('/asistencia/show', [AssistanceController::class, 'showAssistance'])-
 Route::post('/justifications/store', [AssistanceController::class, 'storeJustifications'])->name('justifications.store');
 Route::get('/justifications', [AssistanceController::class, 'showJustifications'])->name('justifications.show');
 Route::delete('/justifications/file/{id}', [AssistanceController::class, 'deleteJustificationFile'])->name('justifications.deleteFile');
+
+
+// Conducta
+Route::get('/conducta', [ConductController::class, 'index'])->name('conducta');
+
+Route::post('/conducta/store', [ConductController::class, 'storeGrades'])->name('conducta.store');
+Route::get('/conducta/show', [ConductController::class, 'showConduct'])->name('conducta.show');
+
+Route::post('/conducta/justifications/store', [ConductController::class, 'storeJustifications'])->name('conducta.justifications.store');
+Route::get('/conducta/justifications', [ConductController::class, 'showJustifications'])->name('conducta.justifications.show');
+Route::delete('/conducta/justifications/file/{id}', [ConductController::class, 'deleteJustificationFile'])->name('conducta.justifications.deleteFile');

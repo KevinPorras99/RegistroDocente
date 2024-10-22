@@ -32,4 +32,8 @@ class Student extends Model
     {
         return $this->hasMany(Assistance::class);
     }
+    public function conducts()
+    {
+        return $this->hasMany(Conduct::class);
+    }
 }
