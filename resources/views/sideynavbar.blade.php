@@ -10,6 +10,54 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('assets/css/home.styles.css') }}">
     <script src="{{ asset('js/sideynavbar.script.js') }}"></script>
+    <style>
+        .sidebar {
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: #343a40;
+            transition: width 0.3s;
+            overflow-x: hidden;
+            z-index: 1000;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+        }
+
+        .navbar {
+            margin-left: 250px;
+            transition: margin-left 0.3s;
+        }
+
+        .navbar.collapsed {
+            margin-left: 0;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: inherit;
+            padding: 0;
+            font: inherit;
+            cursor: pointer;
+            outline: inherit;
+        }
+
+        .toggle-btn:focus {
+            outline: none;
+        }
+
+        .toggle-btn:active {
+            color: inherit;
+        }
+
+        .toggle-btn i {
+            color: inherit;
+        }
+    </style>
     @yield('styles')
 </head>
 <body>
@@ -26,7 +74,7 @@
             <a href="{{ route('tareasyasignaciones') }}"><i class="fas fa-tasks"></i> <span> Tareas o Asignaciones</span></a>
             <a href="{{ route('conducta') }}"><i class="fas fa-user-check"></i> <span> Conducta y Desempeño</span></a>
             <a href="{{ route('asistencia') }}"><i class="fas fa-calendar-check"></i> <span> Asistencia</span></a>
-            <a href="#calificaciones"><i class="fas fa-chart-line"></i> <span> Calificaciones</span></a>
+            <a href="{{ route('calificaciones.index') }}"><i class="fas fa-chart-line"></i> <span> Calificaciones</span></a>
         </div>
         <button class="toggle-btn" onclick="toggleSidebar()">
             <i class="fas fa-arrow-left"></i>
@@ -106,7 +154,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="{{ asset('js/sideynavbar.script.js') }}"></script>
+
     @yield('scripts')
 </body>
 </html>

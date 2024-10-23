@@ -15,6 +15,7 @@ use App\Http\Controllers\GradeController;
 use App\Http\Controllers\TaskGradeController;
 use App\Http\Controllers\AssistanceController;
 use App\Http\Controllers\ConductController;
+use App\Http\Controllers\CalificacionesController;
 
 // Vista por defecto redirigida a login
 Route::get('/', function () {
@@ -114,6 +115,7 @@ Route::get('/conducta', [ConductController::class, 'index'])->name('conducta');
 Route::post('/conducta/store', [ConductController::class, 'storeGrades'])->name('conducta.store');
 Route::get('/conducta/show', [ConductController::class, 'showConduct'])->name('conducta.show');
 
-Route::post('/conducta/justifications/store', [ConductController::class, 'storeJustifications'])->name('conducta.justifications.store');
-Route::get('/conducta/justifications', [ConductController::class, 'showJustifications'])->name('conducta.justifications.show');
-Route::delete('/conducta/justifications/file/{id}', [ConductController::class, 'deleteJustificationFile'])->name('conducta.justifications.deleteFile');
+//calificaciones
+Route::get('/calificaciones', [CalificacionesController::class, 'index'])->name('calificaciones.index');
+Route::get('/calificaciones/show', [CalificacionesController::class, 'showGrades'])->name('calificaciones.show');
+Route::post('/calificaciones/store', [CalificacionesController::class, 'store'])->name('calificaciones.store');
