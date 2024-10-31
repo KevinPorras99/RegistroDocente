@@ -9,7 +9,7 @@ class Conduct extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['student_id', 'course_id', 'cycle', 'description'];
+    protected $fillable = ['student_id', 'course_id', 'cycle', 'cycle_number', 'conduct', 'grade', 'observations'];
 
     public function student()
     {
@@ -21,8 +21,4 @@ class Conduct extends Model
         return $this->belongsTo(Course::class);
     }
 
-    public function justifications()
-    {
-        return $this->hasMany(Justification::class);
-    }
 }

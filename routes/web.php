@@ -111,8 +111,7 @@ Route::delete('/justifications/file/{id}', [AssistanceController::class, 'delete
 
 // Conducta
 Route::get('/conducta', [ConductController::class, 'index'])->name('conducta');
-
-Route::post('/conducta/store', [ConductController::class, 'storeGrades'])->name('conducta.store');
+Route::post('/conducta/storeGrades', [ConductController::class, 'storeGrades'])->name('conducta.storeGrades');
 Route::get('/conducta/show', [ConductController::class, 'showConduct'])->name('conducta.show');
 
 //calificaciones

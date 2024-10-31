@@ -18,6 +18,7 @@ class CreateConductsTable extends Migration
             $table->foreignId('student_id')->constrained()->onDelete('cascade');
             $table->foreignId('course_id')->constrained()->onDelete('cascade');
             $table->string('cycle');
+            $table->string('cycle_number')->nullable(); // Agregar la columna cycle_number
             $table->string('student_name');
             $table->enum('conduct', ['good', 'average', 'poor'])->nullable();
             $table->integer('grade')->nullable();

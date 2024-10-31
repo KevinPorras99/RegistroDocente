@@ -12,14 +12,29 @@
         <h1 class="mb-0"><i class="fas fa-calendar-check"></i> Conducta</h1>
         <form id="filterForm" action="{{ route('conducta.show') }}" method="GET" class="d-inline-block">
             <h2><i class="fas fa-filter"></i> Filtros</h2>
-            <select id="courseSelect" name="course" class="form-control d-inline-block" style="width: 300px;" onchange="this.form.submit();">
+            <select id="courseSelect" name="course" class="form-control d-inline-block" style="width: 300px;" onchange="updateCycleOptions();">
                 <option value="">Seleccione un curso</option>
                 @foreach ($courses as $course)
-                    <option value="{{ $course->id }}" {{ request('course') == $course->id ? 'selected' : '' }}>
+                    <option value="{{ $course->id }}" data-cycles="{{ $course->cycle }}" {{ request('course') == $course->id ? 'selected' : '' }}>
                         {{ $course->name }} - {{ $course->grade }} - {{ $course->institution }} - {{ $course->classroom }}
                     </option>
                 @endforeach
             </select>
+            <select id="cycleSelect" name="cycle" class="form-control d-inline-block ml-2" style="width: 150px;">
+                <option value="">Seleccione un ciclo</option>
+                @if (request('course'))
+                    @php
+                        $selectedCourse = $courses->firstWhere('id', request('course'));
+                        $cycles = $selectedCourse ? explode(',', $selectedCourse->cycle) : [];
+                    @endphp
+                    @foreach ($cycles as $cycle)
+                        <option value="{{ $cycle }}" {{ request('cycle') == $cycle ? 'selected' : '' }}>
+                            {{ $cycle }}
+                        </option>
+                    @endforeach
+                @endif
+            </select>
+            <button type="button" class="btn btn-primary ml-2" onclick="checkFiltersAndSubmit();">Filtrar</button>
         </form>
     </div>
 
@@ -27,8 +42,7 @@
     <div class="d-flex flex-wrap mb-3">
         <form action="{{ route('conducta.show') }}" method="GET" class="mr-2 flex-grow-1 d-flex">
             <input type="hidden" name="course" value="{{ request('course') }}">
-            <input type="text" name="search" placeholder="Buscar estudiante..." class="form-control"
-                style="width: 60%;" {{ (!request('course')) ? 'disabled' : '' }}>
+            <input type="text" name="search" placeholder="Buscar estudiante..." class="form-control" style="width: 60%;" {{ (!request('course')) ? 'disabled' : '' }}>
             <button type="submit" class="btn btn-primary ml-2 mt-md-0" {{ (!request('course')) ? 'disabled' : '' }}>Buscar</button>
             <a href="{{ route('conducta') }}" class="btn btn-secondary ml-2 mt-md-0">Borrar Filtros</a>
         </form>
@@ -46,9 +60,11 @@
         </div>
     @endif
         <!-- Lista de estudiantes -->
-        <form action="{{ route('conducta.store') }}" method="POST">
+        <form action="{{ route('conducta.storeGrades') }}" method="POST">
             @csrf
             <input type="hidden" name="course" value="{{ request('course') }}">
+            <input type="hidden" name="cycle" value="{{ request('cycle') }}">
+            <input type="hidden" name="cycle_number" value="{{ request('cycle_number') }}">
             <div class="container">
                 <h1>Lista de Estudiantes</h1>
                 <div class="table-responsive">
@@ -56,6 +72,7 @@
                         <thead>
                             <tr>
                                 <th>Nombre del Estudiante</th>
+                                <th>Ciclo</th>
                                 <th>Conducta</th>
                                 <th>Calificar</th>
                                 <th>Observaciones</th>
@@ -65,63 +82,22 @@
                             @foreach($students as $student)
                             <tr>
                                 <td>{{ $student->name }}</td>
+                                <td>{{ request('cycle') }}</td>
                                 <td>
                                     <select name="conduct[{{ $student->id }}]" class="form-control">
                                         <option value="">Sin asignar</option>
-                                        <option value="good" {{ $student->conduct && $student->conduct->status == 'good' ? 'selected' : '' }}>Buena</option>
-                                        <option value="average" {{ $student->conduct && $student->conduct->status == 'average' ? 'selected' : '' }}>Regular</option>
-                                        <option value="poor" {{ $student->conduct && $student->conduct->status == 'poor' ? 'selected' : '' }}>Mala</option>
+                                        <option value="good" {{ $student->conducts->where('cycle', request('cycle'))->where('cycle_number', request('cycle_number'))->first()?->conduct == 'good' ? 'selected' : '' }}>Buena</option>
+                                        <option value="average" {{ $student->conducts->where('cycle', request('cycle'))->where('cycle_number', request('cycle_number'))->first()?->conduct == 'average' ? 'selected' : '' }}>Regular</option>
+                                        <option value="poor" {{ $student->conducts->where('cycle', request('cycle'))->where('cycle_number', request('cycle_number'))->first()?->conduct == 'poor' ? 'selected' : '' }}>Mala</option>
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="number" name="grade[{{ $student->id }}]" class="form-control" min="0" max="100">
+                                    <input type="number" name="grade[{{ $student->id }}]" class="form-control" min="0" max="100" value="{{ $student->conducts->where('cycle', request('cycle'))->where('cycle_number', request('cycle_number'))->first()?->grade ?? '' }}">
                                 </td>
                                 <td>
-                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addObservationModal-{{ $student->id }}">Agregar Observaciones</button>
-                                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#viewObservationModal-{{ $student->id }}">Ver Observaciones</button>
+                                    <textarea name="observations[{{ $student->id }}]" class="form-control" rows="2">{{ $student->conducts->where('cycle', request('cycle'))->where('cycle_number', request('cycle_number'))->first()?->observations ?? '' }}</textarea>
                                 </td>
                             </tr>
-
-                            <!-- Modal para agregar observaciones -->
-                            <div class="modal fade" id="addObservationModal-{{ $student->id }}" tabindex="-1" role="dialog" aria-labelledby="addObservationModalLabel-{{ $student->id }}" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="addObservationModalLabel-{{ $student->id }}">Agregar Observaciones para {{ $student->name }}</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <textarea name="observations[{{ $student->id }}]" class="form-control" rows="4"></textarea>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                                            <button type="submit" class="btn btn-primary">Guardar Observaciones</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Modal para ver observaciones -->
-                            <div class="modal fade" id="viewObservationModal-{{ $student->id }}" tabindex="-1" role="dialog" aria-labelledby="viewObservationModalLabel-{{ $student->id }}" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="viewObservationModalLabel-{{ $student->id }}">Observaciones para {{ $student->name }}</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p>{{ $student->observations }}</p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                             @endforeach
                         </tbody>
                     </table>
@@ -142,6 +118,56 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
+    function createCycleOptions(cycles, selectedCycle, cycleSelectId) {
+        const cycleSelect = document.getElementById(cycleSelectId);
+        cycleSelect.innerHTML = '<option value="">Seleccione un ciclo</option>';
+
+        if (cycles) {
+            const cycleOptions = cycles.split(',');
+            cycleOptions.forEach(cycle => {
+                const options = [];
+                if (cycle.toLowerCase() === 'semestre') {
+                    options.push('Primer Semestre', 'Segundo Semestre');
+                } else if (cycle.toLowerCase() === 'trimestre') {
+                    options.push('Primer Trimestre', 'Segundo Trimestre', 'Tercer Trimestre');
+                } else if (cycle.toLowerCase() === 'cuatrimestre') {
+                    options.push('Primer Cuatrimestre', 'Segundo Cuatrimestre', 'Tercer Cuatrimestre', 'Cuarto Cuatrimestre');
+                } else {
+                    options.push(cycle);
+                }
+                options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.text = opt;
+                    if (opt === selectedCycle) option.selected = true;
+                    cycleSelect.appendChild(option);
+                });
+            });
+        }
+    }
+
+    function updateCycleOptions() {
+        const courseSelect = document.getElementById('courseSelect');
+        const selectedCourse = courseSelect.options[courseSelect.selectedIndex];
+        const cycles = selectedCourse.getAttribute('data-cycles');
+        const selectedCycle = "{{ request('cycle') }}";
+        createCycleOptions(cycles, selectedCycle, 'cycleSelect');
+    }
+
+    function checkFiltersAndSubmit() {
+        const courseSelect = document.getElementById('courseSelect').value;
+        const cycleSelect = document.getElementById('cycleSelect').value;
+        if (courseSelect && cycleSelect) {
+            document.getElementById('filterForm').submit();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (document.getElementById('courseSelect').value) {
+            updateCycleOptions();
+        }
+    });
+
     $(document).ready(function() {
         setTimeout(function() {
             $('#success-message').fadeOut('slow');
