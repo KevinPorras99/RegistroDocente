@@ -210,8 +210,8 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <select name="justifications[{{ $justification->id }}][justification_status]" class="form-control mr-2">
-                                                    <option value="justified" {{ $existingJustification && $existingJustification->justification_status == 'justified' ? 'selected' : '' }}>Justificado</option>
                                                     <option value="not_justified" {{ $existingJustification && $existingJustification->justification_status == 'not_justified' ? 'selected' : '' }}>Sin justificar</option>
+                                                    <option value="justified" {{ $existingJustification && $existingJustification->justification_status == 'justified' ? 'selected' : '' }}>Justificado</option>
                                                 </select>
                                                 @if ($existingJustification && $existingJustification->justification_status == 'justified')
                                                     <i class="fas fa-check-circle text-success"></i>

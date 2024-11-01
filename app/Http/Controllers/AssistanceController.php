@@ -112,6 +112,7 @@ class AssistanceController extends Controller
     }
 
  
+  
     public function storeJustifications(Request $request)
     {
         $data = $request->validate([
@@ -149,6 +150,9 @@ class AssistanceController extends Controller
         foreach ($students as $student) {
             foreach ($student->courses as $course) {
                 $totalAssistances = $student->assistances->where('course_id', $course->id)->count();
+                if ($totalAssistances == 0) {
+                    continue; // Evitar división por cero
+                }
                 $absences = $student->assistances->where('course_id', $course->id)->where('status', 'absent')->count();
                 $lates = $student->assistances->where('course_id', $course->id)->where('status', 'late')->count();
 
