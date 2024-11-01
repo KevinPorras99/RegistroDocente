@@ -30,8 +30,9 @@
                         <tr>
                             <th>Estudiante</th>
                             @foreach ($dailyWorks as $dailyWork)
-                                <th>{{ $dailyWork->name }}</th>
+                                <th>{{ $dailyWork->name }} ({{ $dailyWork->percentage }}%)</th>
                             @endforeach
+                            <th>Porcentaje Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -40,9 +41,17 @@
                                 <td>{{ $student->name }}</td>
                                 @foreach ($dailyWorks as $dailyWork)
                                     <td>
-                                        <input type="number" class="form-control" name="grades[{{ $student->id }}][{{ $dailyWork->id }}]" value="{{ $dailyWork->grades[$student->id] ?? '' }}" min="0" max="100">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" name="grades[{{ $student->id }}][{{ $dailyWork->id }}]" value="{{ old('grades.' . $student->id . '.' . $dailyWork->id, $dailyWork->grades[$student->id] ?? '') }}" min="0" max="100">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">
+                                                    {{ $dailyWork->percentages[$student->id] ?? '0' }}%
+                                                </span>
+                                            </div>
+                                        </div>
                                     </td>
                                 @endforeach
+                                <td>{{ $studentPercentages[$student->id] ?? '0' }}%</td>
                             </tr>
                         @endforeach
                     </tbody>

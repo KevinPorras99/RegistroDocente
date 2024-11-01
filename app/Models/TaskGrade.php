@@ -13,5 +13,16 @@ class TaskGrade extends Model
         'task_id',
         'student_id',
         'grade',
+        'percentage_obtained',
     ];
+
+    public function task()
+    {
+        return $this->belongsTo(Task::class);
+    }
+
+    public function student()
+    {
+        return $this->belongsTo(Student::class);
+    }
 }

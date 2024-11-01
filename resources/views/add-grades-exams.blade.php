@@ -30,20 +30,29 @@
                     <tr>
                         <th>Estudiante</th>
                         @foreach ($exams as $exam)
-                        <th>{{ $exam->name }}</th>
+                            <th>{{ $exam->name }} ({{ $exam->percentage }}%)</th>
                         @endforeach
+                        <th>Porcentaje Total</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($students as $student)
-                    <tr>
-                        <td>{{ $student->name }}</td>
-                        @foreach ($exams as $exam)
-                        <td>
-                            <input type="number" class="form-control" name="grades[{{ $exam->id }}][{{ $student->id }}]" value="{{ $exam->grades[$student->id] ?? '' }}" min="0" max="100">
-                        </td>
-                        @endforeach
-                    </tr>
+                        <tr>
+                            <td>{{ $student->name }}</td>
+                            @foreach ($exams as $exam)
+                                <td>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" name="grades[{{ $exam->id }}][{{ $student->id }}]" value="{{ old('grades.' . $exam->id . '.' . $student->id, $exam->grades[$student->id] ?? '') }}" min="0" max="100">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                {{ $exam->percentages[$student->id] ?? '0' }}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+                            @endforeach
+                            <td>{{ $studentPercentages[$student->id] ?? '0' }}%</td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>

@@ -13,5 +13,16 @@ class DailyWorkGrade extends Model
         'daily_work_id',
         'student_id',
         'grade',
+        'percentage_obtained',
     ];
+
+    public function dailyWork()
+    {
+        return $this->belongsTo(DailyWork::class);
+    }
+
+    public function student()
+    {
+        return $this->belongsTo(Student::class);
+    }
 }

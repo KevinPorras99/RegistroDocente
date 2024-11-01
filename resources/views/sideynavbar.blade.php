@@ -17,7 +17,7 @@
             top: 0;
             left: 0;
             height: 100%;
-            background-color: #343a40;
+            background-color: #4e73df;
             transition: width 0.3s;
             overflow-x: hidden;
             z-index: 1000;

@@ -10,21 +10,6 @@ use App\Models\User;
 
 class ExamGradeController extends Controller
 {
-    public function showAddGradesForm($courseId, $cycle)
-    {
-        $course = Course::findOrFail($courseId);
-        $students = $course->students; // Asumiendo que tienes una relación entre cursos y estudiantes
-        $exams = Exam::where('course_id', $courseId)->where('cycle', $cycle)->get();
-        $user = auth()->user(); // Obtener el usuario autenticado
-
-        // Obtener las calificaciones existentes
-        foreach ($exams as $exam) {
-            $exam->grades = $exam->grades()->pluck('grade', 'student_id')->toArray();
-        }
-
-        return view('add-grades-exams', compact('course', 'students', 'exams', 'cycle', 'user'));
-    }
-
     public function storeGrades(Request $request, $courseId)
     {
         $request->validate([
@@ -34,6 +19,9 @@ class ExamGradeController extends Controller
 
         foreach ($request->grades as $examId => $students) {
             foreach ($students as $studentId => $grade) {
+                $exam = Exam::findOrFail($examId);
+                $percentageObtained = ($grade / 100) * $exam->percentage;
+
                 ExamGrade::updateOrCreate(
                     [
                         'student_id' => $studentId,
@@ -41,11 +29,39 @@ class ExamGradeController extends Controller
                     ],
                     [
                         'grade' => $grade,
+                        'percentage_obtained' => $percentageObtained,
                     ]
                 );
             }
         }
 
         return redirect()->back()->with('success', 'Calificaciones guardadas exitosamente.');
+    }
+
+    public function showAddGradesForm($courseId, $cycle)
+    {
+        $course = Course::findOrFail($courseId);
+        $students = $course->students;
+        $exams = Exam::where('course_id', $courseId)->where('cycle', $cycle)->get();
+        $user = auth()->user();
+
+        foreach ($exams as $exam) {
+            $exam->grades = $exam->grades()->pluck('grade', 'student_id')->toArray();
+            $exam->percentages = $exam->grades()->pluck('percentage_obtained', 'student_id')->toArray();
+        }
+
+        // Calcular el porcentaje total obtenido por cada estudiante
+        $studentPercentages = [];
+        foreach ($students as $student) {
+            $totalPercentage = 0;
+            foreach ($exams as $exam) {
+                if (isset($exam->percentages[$student->id])) {
+                    $totalPercentage += $exam->percentages[$student->id];
+                }
+            }
+            $studentPercentages[$student->id] = $totalPercentage;
+        }
+
+        return view('add-grades-exams', compact('course', 'students', 'exams', 'cycle', 'user', 'studentPercentages'));
     }
 }

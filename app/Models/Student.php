@@ -36,4 +36,19 @@ class Student extends Model
     {
         return $this->hasMany(Conduct::class);
     }
+
+    public function calificaciones()
+    {
+        return $this->hasMany(Calificaciones::class);
+    }
+
+    public function dailyWorkGrades()
+    {
+        return $this->hasMany(DailyWorkGrade::class);
+    }
+
+    public function taskGrades()
+    {
+        return $this->hasMany(TaskGrade::class);
+    }
 }

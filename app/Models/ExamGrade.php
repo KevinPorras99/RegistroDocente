@@ -9,7 +9,12 @@ class ExamGrade extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['exam_id', 'student_id', 'grade'];
+    protected $fillable = [
+        'exam_id',
+        'student_id',
+        'grade',
+        'percentage_obtained', // Agregar esta línea
+    ];
 
 
     public function student()

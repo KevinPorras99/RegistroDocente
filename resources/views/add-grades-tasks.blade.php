@@ -41,6 +41,7 @@
                             @foreach ($tasks as $task)
                                 <th>{{ $task->name }} ({{ $task->percentage }}%)</th>
                             @endforeach
+                            <th>Porcentaje Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -49,9 +50,17 @@
                                 <td>{{ $student->name }}</td>
                                 @foreach ($tasks as $task)
                                     <td>
-                                        <input type="number" class="form-control" name="grades[{{ $student->id }}][{{ $task->id }}]" value="{{ old('grades.' . $student->id . '.' . $task->id, $task->grades[$student->id] ?? '') }}" min="0" max="100">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" name="grades[{{ $student->id }}][{{ $task->id }}]" value="{{ old('grades.' . $student->id . '.' . $task->id, $task->grades[$student->id] ?? '') }}" min="0" max="100">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">
+                                                    {{ $task->percentages[$student->id] ?? '0' }}%
+                                                </span>
+                                            </div>
+                                        </div>
                                     </td>
                                 @endforeach
+                                <td>{{ $studentPercentages[$student->id] ?? '0' }}%</td>
                             </tr>
                         @endforeach
                     </tbody>

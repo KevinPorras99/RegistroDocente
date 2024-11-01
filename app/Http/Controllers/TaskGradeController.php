@@ -17,14 +17,29 @@ class TaskGradeController extends Controller
         $tasks = Task::where('course_id', $courseId)->where('cycle', $cycle)->get();
         $user = auth()->user(); // Obtener el usuario autenticado
 
-        // Obtener las calificaciones existentes
+        // Obtener las calificaciones existentes y los porcentajes obtenidos
         foreach ($tasks as $task) {
             $task->grades = $task->grades()->pluck('grade', 'student_id')->toArray();
+            $task->percentages = $task->grades()->pluck('percentage_obtained', 'student_id')->toArray();
         }
 
-        return view('add-grades-tasks', compact('course', 'students', 'tasks', 'cycle', 'user'));
-    }
+        // Calcular el porcentaje total obtenido por cada estudiante
+        $studentPercentages = [];
+        foreach ($students as $student) {
+            $totalPercentage = 0;
+            foreach ($tasks as $task) {
+                if (isset($task->percentages[$student->id])) {
+                    $totalPercentage += $task->percentages[$student->id];
+                }
+            }
+            $studentPercentages[$student->id] = $totalPercentage;
+        }
 
+        return view('add-grades-tasks', compact('course', 'students', 'tasks', 'cycle', 'user', 'studentPercentages'));
+    }
+    
+
+    
     public function storeGrades(Request $request, $courseId)
     {
         $request->validate([
@@ -34,11 +49,8 @@ class TaskGradeController extends Controller
 
         foreach ($request->grades as $studentId => $tasks) {
             foreach ($tasks as $taskId => $grade) {
-                // Verificar que el task_id exista en la tabla tasks
-                if (!Task::where('id', $taskId)->exists()) {
-                    // Omitir esta tarea y continuar con las demás
-                    continue;
-                }
+                $task = Task::findOrFail($taskId);
+                $percentageObtained = ($grade / 100) * $task->percentage;
 
                 TaskGrade::updateOrCreate(
                     [
@@ -47,6 +59,7 @@ class TaskGradeController extends Controller
                     ],
                     [
                         'grade' => $grade,
+                        'percentage_obtained' => $percentageObtained,
                     ]
                 );
             }

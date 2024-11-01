@@ -118,3 +118,4 @@ Route::get('/conducta/show', [ConductController::class, 'showConduct'])->name('c
 Route::get('/calificaciones', [CalificacionesController::class, 'index'])->name('calificaciones.index');
 Route::get('/calificaciones/show', [CalificacionesController::class, 'showGrades'])->name('calificaciones.show');
 Route::post('/calificaciones/store', [CalificacionesController::class, 'store'])->name('calificaciones.store');
+
