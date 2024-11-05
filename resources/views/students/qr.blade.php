@@ -18,7 +18,8 @@
                     <p class="card-text">Sección: {{ $student->section }}</p>
                 </div>
                 <div class="qr-code-container">
-                    {!! file_get_contents(public_path($student->qr_code_url)) !!}
+
+                    {!! QrCode::size(200)->generate(route('students.show', $student->id)) !!}
                 </div>
             </div>
         </div>
