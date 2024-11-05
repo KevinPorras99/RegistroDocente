@@ -10,6 +10,8 @@ use App\Models\User;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\StudentsImport;
 use App\Exports\StudentsTemplateExport;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\Storage;
 
 
 class StudentController extends Controller
@@ -46,7 +48,7 @@ class StudentController extends Controller
             'institution' => 'required|string|max:255',
             'section' => 'required|string|max:255',
         ]);
-
+    
         // Crear un nuevo estudiante y asociarlo con el usuario autenticado
         $student = new Student();
         $student->name = $request->input('name');
@@ -55,7 +57,19 @@ class StudentController extends Controller
         $student->section = $request->input('section');
         $student->user_id = Auth::id(); // Asociar el estudiante con el usuario autenticado
         $student->save();
-
+    
+        // Obtener la dirección IP del servidor local
+        $serverIp = request()->server('SERVER_ADDR');
+    
+        // Generar el código QR con la dirección IP del servidor local
+        $qrCode = QrCode::size(200)->generate("http://{$serverIp}/students/{$student->id}");
+        $qrCodePath = 'qrcodes/' . $student->id . '.svg';
+        Storage::disk('public')->put($qrCodePath, $qrCode);
+    
+        // Guardar la URL del código QR en la base de datos
+        $student->qr_code_url = Storage::url($qrCodePath);
+        $student->save();
+    
         // Redirigir a la lista de estudiantes con un mensaje de éxito
         return redirect()->route('students.index')->with('success', 'Estudiante agregado exitosamente');
     }
@@ -120,5 +134,10 @@ class StudentController extends Controller
     {
         $student = Student::findOrFail($id);
         return view('students.show', compact('student'));
+    }
+
+    public function showQrCode($id) {
+        $student = Student::findOrFail($id);
+        return view('students.qr', compact('student'));
     }
 }

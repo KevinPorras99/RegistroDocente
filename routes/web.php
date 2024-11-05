@@ -24,6 +24,7 @@ Route::get('/', function () {
 //estudiantes
 Route::resource('students', StudentController::class)->middleware('auth');
 Route::get('/estudiantes', [StudentController::class, 'index'])->name('estudiantes');
+Route::get('/students/{id}/qr', [StudentController::class, 'showQrCode'])->name('students.qr');
 //cursos
 Route::resource('courses', CourseController::class)->middleware('auth');
 Route::get('/cursos', [CourseController::class, 'index'])->name('cursos');
@@ -103,7 +104,7 @@ Route::get('/asistencia', [AssistanceController::class, 'index'])->name('asisten
 
 Route::post('/asistencia/store', [AssistanceController::class, 'store'])->name('asistencia.store');
 Route::get('/asistencia/show', [AssistanceController::class, 'showAssistance'])->name('asistencia.show');
-
+Route::post('/assistance/mark-attendance', [AssistanceController::class, 'markAttendance'])->name('assistance.markAttendance');
 Route::post('/justifications/store', [AssistanceController::class, 'storeJustifications'])->name('justifications.store');
 Route::get('/justifications', [AssistanceController::class, 'showJustifications'])->name('justifications.show');
 Route::delete('/justifications/file/{id}', [AssistanceController::class, 'deleteJustificationFile'])->name('justifications.deleteFile');

@@ -231,5 +231,24 @@ class AssistanceController extends Controller
 
         return redirect()->back()->with('success', 'Archivo de justificación eliminado correctamente.');
     }
+
+    public function markAttendance(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'course_id' => 'required|exists:courses,id',
+        ]);
+
+        $studentId = $request->student_id;
+        $courseId = $request->course_id;
+        $date = Carbon::now()->format('Y-m-d');
+
+        $assistance = Assistance::updateOrCreate(
+            ['student_id' => $studentId, 'course_id' => $courseId, 'date' => $date],
+            ['status' => 'present']
+        );
+
+        return response()->json(['success' => true]);
+    }
     
 }

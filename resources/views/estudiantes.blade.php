@@ -36,7 +36,6 @@
             </form>
         </div>
 
-
         <!-- Modal para agregar estudiante -->
         <div id="addStudentModal" class="modal" style="display: none;">
             <div class="modal-dialog">
@@ -70,6 +69,7 @@
                 </div>
             </div>
         </div>
+
 
         <!-- Modal para visualizar estudiante -->
         <div id="viewStudentModal" class="modal" style="display: none;">
@@ -124,6 +124,7 @@
             </div>
         </div>
 
+
         <!-- Lista de estudiantes -->
         <div class="container">
             <h1>Lista de Estudiantes</h1>
@@ -157,6 +158,9 @@
                                     <button class="btn btn-sm" style="background-color: transparent;" onclick="openEditStudentModal({{ json_encode($student) }})">
                                         <i class="fas fa-pencil-alt" style="color: green; font-size: 1rem;"></i>
                                     </button>
+                                    <a href="{{ route('students.qr', $student->id) }}" class="btn btn-sm" style="background-color: transparent;">
+                                        <i class="fas fa-qrcode" style="color: black; font-size: 1rem;"></i>
+                                    </a>
                                     <form action="{{ route('students.destroy', $student->id) }}" method="POST" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
@@ -175,10 +179,9 @@
                 </table>
             </div>
         </div>
-            <!-- Enlaces de paginación -->
-            <div class="d-flex justify-content-center">
-                {{ $students->links('pagination::bootstrap-4') }}
-            </div>
+        <!-- Enlaces de paginación -->
+        <div class="d-flex justify-content-center">
+            {{ $students->links('pagination::bootstrap-4') }}
         </div>
     </div>
 @endsection
@@ -209,16 +212,16 @@
         }
 
         function openEditStudentModal(student) {
-        var formAction = `{{ route('students.update', ':id') }}`;
-        formAction = formAction.replace(':id', student.id);
-        document.getElementById('editStudentForm').action = formAction;
+            var formAction = `{{ route('students.update', ':id') }}`;
+            formAction = formAction.replace(':id', student.id);
+            document.getElementById('editStudentForm').action = formAction;
 
-        document.getElementById('edit-name').value = student.name;
-        document.getElementById('edit-grade').value = student.grade;
-        document.getElementById('edit-institution').value = student.institution;
-        document.getElementById('edit-section').value = student.section;
+            document.getElementById('edit-name').value = student.name;
+            document.getElementById('edit-grade').value = student.grade;
+            document.getElementById('edit-institution').value = student.institution;
+            document.getElementById('edit-section').value = student.section;
 
-        document.getElementById('editStudentModal').style.display = 'block';
+            document.getElementById('editStudentModal').style.display = 'block';
         }
 
         function closeEditStudentModal() {

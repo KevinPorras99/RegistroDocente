@@ -61,7 +61,6 @@
 
 @section('content')
     <div class="content">
-        
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h1 class="mb-0"><i class="fas fa-calendar-check"></i> Asistencia</h1>
@@ -107,6 +106,17 @@
                 {{ session('success') }}
             </div>
         @endif
+
+            <!-- Botón para escanear QR -->
+            <button class="btn btn-primary mb-3" onclick="openQrScanner()">Escanear QR</button>
+
+            <!-- Contenedor para el escáner QR -->
+            <div id="qrScanner" style="display: none;">
+                <video id="qrVideo" width="300" height="200"></video>
+                <button class="btn btn-secondary" onclick="closeQrScanner()">Cerrar</button>
+                <button class="btn btn-primary" onclick="captureImage()">Tomar Foto</button>
+            </div>
+
             <!-- Lista de estudiantes en formato de calendario -->
             <form action="{{ route('asistencia.store') }}" method="POST">
                 @csrf
@@ -141,7 +151,7 @@
                                                 }
                                             }
                                         @endphp
-                                        <td class="{{ $markedClass }}">
+                                        <td id="attendance-{{ $student->id }}-{{ $date->format('Y-m-d') }}" class="{{ $markedClass }}">
                                             <select name="attendance[{{ $student->id }}][{{ $date->format('Y-m-d') }}]" class="form-control">
                                                 <option value="">Sin asignar</option>
                                                 <option value="present" {{ $attendance && $attendance->status == 'present' ? 'selected' : '' }}>Presente</option>
@@ -274,7 +284,87 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.min.js"></script>
     <script>
+        let video = document.getElementById('qrVideo');
+        let canvasElement = document.createElement('canvas');
+        let canvas = canvasElement.getContext('2d');
+        let scanning = false;
+
+        function openQrScanner() {
+            document.getElementById('qrScanner').style.display = 'block';
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(function(stream) {
+                video.srcObject = stream;
+                video.setAttribute('playsinline', true); // required to tell iOS safari we don't want fullscreen
+                video.play();
+                scanning = true;
+                tick();
+            });
+        }
+
+        function closeQrScanner() {
+            scanning = false;
+            video.srcObject.getTracks().forEach(track => track.stop());
+            document.getElementById('qrScanner').style.display = 'none';
+        }
+
+        function tick() {
+            canvasElement.height = video.videoHeight;
+            canvasElement.width = video.videoWidth;
+            canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+            scanning && requestAnimationFrame(tick);
+        }
+
+        function captureImage() {
+            let imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+            let code = jsQR(imageData.data, imageData.width, imageData.height, {
+                inversionAttempts: 'dontInvert',
+            });
+            if (code) {
+                scanning = false;
+                video.srcObject.getTracks().forEach(track => track.stop());
+                document.getElementById('qrScanner').style.display = 'none';
+                markAttendance(code.data);
+            } else {
+                alert('No se pudo detectar un código QR. Inténtalo de nuevo.');
+            }
+        }
+
+        function markAttendance(studentId) {
+            const courseId = document.getElementById('course').value;
+            const date = new Date().toISOString().split('T')[0]; // Obtener la fecha actual en formato YYYY-MM-DD
+            fetch('{{ route('assistance.markAttendance') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ student_id: studentId, course_id: courseId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Asistencia marcada correctamente.');
+                    // Actualizar la celda correspondiente en la tabla de calendario
+                    const cell = document.getElementById(`attendance-${studentId}-${date}`);
+                    if (cell) {
+                        cell.classList.remove('attendance-marked', 'late', 'absent');
+                        cell.classList.add('attendance-marked', 'present');
+                        const select = cell.querySelector('select');
+                        if (select) {
+                            select.value = 'present';
+                        }
+                    }
+                } else {
+                    alert('Error al marcar la asistencia.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al marcar la asistencia.');
+            });
+        }
+
         $(document).ready(function() {
             setTimeout(function() {
                 $('#success-message').fadeOut('slow');
