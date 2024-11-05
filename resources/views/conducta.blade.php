@@ -64,7 +64,6 @@
             @csrf
             <input type="hidden" name="course" value="{{ request('course') }}">
             <input type="hidden" name="cycle" value="{{ request('cycle') }}">
-            <input type="hidden" name="cycle_number" value="{{ request('cycle_number') }}">
             <div class="container">
                 <h1>Lista de Estudiantes</h1>
                 <div class="table-responsive">
@@ -86,16 +85,16 @@
                                 <td>
                                     <select name="conduct[{{ $student->id }}]" class="form-control">
                                         <option value="">Sin asignar</option>
-                                        <option value="good" {{ $student->conducts->where('cycle', request('cycle'))->where('cycle_number', request('cycle_number'))->first()?->conduct == 'good' ? 'selected' : '' }}>Buena</option>
-                                        <option value="average" {{ $student->conducts->where('cycle', request('cycle'))->where('cycle_number', request('cycle_number'))->first()?->conduct == 'average' ? 'selected' : '' }}>Regular</option>
-                                        <option value="poor" {{ $student->conducts->where('cycle', request('cycle'))->where('cycle_number', request('cycle_number'))->first()?->conduct == 'poor' ? 'selected' : '' }}>Mala</option>
+                                        <option value="good" {{ $student->conducts->where('cycle', request('cycle'))->first()?->conduct == 'good' ? 'selected' : '' }}>Buena</option>
+                                        <option value="average" {{ $student->conducts->where('cycle', request('cycle'))->first()?->conduct == 'average' ? 'selected' : '' }}>Regular</option>
+                                        <option value="poor" {{ $student->conducts->where('cycle', request('cycle'))->first()?->conduct == 'poor' ? 'selected' : '' }}>Mala</option>
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="number" name="grade[{{ $student->id }}]" class="form-control" min="0" max="100" value="{{ $student->conducts->where('cycle', request('cycle'))->where('cycle_number', request('cycle_number'))->first()?->grade ?? '' }}">
+                                    <input type="number" name="grade[{{ $student->id }}]" class="form-control" min="0" max="100" value="{{ $student->conducts->where('cycle', request('cycle'))->first()?->grade ?? '' }}">
                                 </td>
                                 <td>
-                                    <textarea name="observations[{{ $student->id }}]" class="form-control" rows="2">{{ $student->conducts->where('cycle', request('cycle'))->where('cycle_number', request('cycle_number'))->first()?->observations ?? '' }}</textarea>
+                                    <textarea name="observations[{{ $student->id }}]" class="form-control" rows="2">{{ $student->conducts->where('cycle', request('cycle'))->first()?->observations ?? '' }}</textarea>
                                 </td>
                             </tr>
                             @endforeach

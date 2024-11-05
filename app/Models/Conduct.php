@@ -9,7 +9,14 @@ class Conduct extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['student_id', 'course_id', 'cycle', 'cycle_number', 'conduct', 'grade', 'observations'];
+    protected $fillable = 
+    ['student_id', 
+    'course_id',
+     'cycle', 
+     'cycle_number', 
+     'conduct', 
+     'grade', 
+     'observations'];
 
     public function student()
     {

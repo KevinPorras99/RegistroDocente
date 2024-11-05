@@ -4,10 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use App\Models\Course;
 use App\Models\Conduct;
-use App\Models\Justification;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Storage;
 
 class ConductController extends Controller
 {
@@ -37,25 +34,21 @@ class ConductController extends Controller
             'observations.*' => 'nullable|string|max:255',
             'course' => 'required|exists:courses,id',
             'cycle' => 'required|string',
-            'cycle_number' => 'required|string',
         ]);
 
         $courseId = $data['course'];
         $cycle = $data['cycle'];
-        $cycleNumber = $data['cycle_number'];
 
         foreach ($data['conduct'] as $studentId => $status) {
             $grade = $data['grade'][$studentId] ?? null;
             $observations = $data['observations'][$studentId] ?? null;
 
             Conduct::updateOrCreate(
-                ['student_id' => $studentId, 'course_id' => $courseId, 'cycle' => $cycle, 'cycle_number' => $cycleNumber],
+                ['student_id' => $studentId, 'course_id' => $courseId, 'cycle' => $cycle],
                 ['conduct' => $status, 'grade' => $grade, 'observations' => $observations]
             );
         }
 
         return redirect()->back()->with('success', 'Conducta guardada correctamente.');
     }
-
-    
 }
